@@ -1,69 +1,113 @@
 import { useState } from "react";
 import {
   Alert,
+  Keyboard,
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
-  View,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { Button } from "@/src/components/common/Button";
+import { Input } from "@/src/components/common/input";
 import { loginUser } from "@/src/services/auth";
 import { saveAuthData } from "@/src/storage/auth-storage";
+import { normalizeEmail, validateLogin } from "@/src/utils/authValidators";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleLogin() {
-    try {
-      if (!email || !password) {
-        Alert.alert("Atenção", "Preencha e-mail e senha.");
-        return;
-      }
+    if (loading) {
+      return;
+    }
 
-      const data = await loginUser({ email, password });
+    const validationError = validateLogin({
+      email,
+      password,
+    });
+
+    if (validationError) {
+      Alert.alert("Atenção", validationError);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      Keyboard.dismiss();
+
+      const normalizedEmail = normalizeEmail(email);
+
+      const data = await loginUser({
+        email: normalizedEmail,
+        password,
+      });
 
       await saveAuthData(data.token, data.user);
 
       router.replace("/home");
-    } catch {
-      Alert.alert("Erro", "Não foi possível fazer login.");
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+
+      Alert.alert(
+        "Erro",
+        "Não foi possível fazer login. Verifique seus dados e tente novamente.",
+      );
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Entrar</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Entrar</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        placeholderTextColor="#94a3b8"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
+        <Input
+          placeholder="E-mail"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="email-address"
+          textContentType="emailAddress"
+          editable={!loading}
+          returnKeyType="next"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        placeholderTextColor="#94a3b8"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <Input
+          placeholder="Senha"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+          autoCorrect={false}
+          textContentType="password"
+          editable={!loading}
+          returnKeyType="done"
+          onSubmitEditing={handleLogin}
+        />
 
-      <Pressable style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Entrar</Text>
-      </Pressable>
+        <Button
+          title="Entrar"
+          loadingTitle="Entrando..."
+          loading={loading}
+          onPress={handleLogin}
+        />
 
-      <Pressable onPress={() => router.push("/register")}>
-        <Text style={styles.link}>Criar uma conta</Text>
-      </Pressable>
-    </SafeAreaView>
+        <Pressable
+          style={styles.linkButton}
+          onPress={() => router.push("/register")}
+          disabled={loading}
+        >
+          <Text style={styles.link}>Criar uma conta</Text>
+        </Pressable>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -75,37 +119,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    color: "#fff",
+    color: "#ffffff",
     fontSize: 32,
     fontWeight: "700",
     marginBottom: 32,
     textAlign: "center",
   },
-  input: {
-    backgroundColor: "#1e293b",
-    color: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#334155",
-  },
-  button: {
-    backgroundColor: "#22c55e",
-    borderRadius: 12,
-    padding: 16,
+  linkButton: {
+    paddingVertical: 12,
     alignItems: "center",
-    marginTop: 8,
-  },
-  buttonText: {
-    color: "#052e16",
-    fontSize: 16,
-    fontWeight: "700",
   },
   link: {
     color: "#38bdf8",
     textAlign: "center",
-    marginTop: 24,
+    marginTop: 12,
     fontSize: 16,
+    fontWeight: "600",
   },
 });

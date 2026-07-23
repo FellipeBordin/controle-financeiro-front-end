@@ -1,71 +1,133 @@
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, TextInput } from "react-native";
+import {
+  Alert,
+  Keyboard,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { Button } from "@/src/components/common/Button";
+import { Input } from "@/src/components/common/input";
 import { registerUser } from "@/src/services/auth";
 import { saveAuthData } from "@/src/storage/auth-storage";
+import { normalizeEmail, validateRegister } from "@/src/utils/authValidators";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function handleRegister() {
-    try {
-      if (!name || !email || !password) {
-        Alert.alert("Atenção", "Preencha todos os campos.");
-        return;
-      }
+    if (loading) {
+      return;
+    }
 
-      const data = await registerUser({ name, email, password });
+    const validationError = validateRegister({
+      name,
+      email,
+      password,
+    });
+
+    if (validationError) {
+      Alert.alert("Atenção", validationError);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      Keyboard.dismiss();
+
+      const normalizedName = name.trim();
+      const normalizedEmail = normalizeEmail(email);
+
+      const data = await registerUser({
+        name: normalizedName,
+        email: normalizedEmail,
+        password,
+      });
 
       await saveAuthData(data.token, data.user);
 
       router.replace("/home");
-    } catch {
-      Alert.alert("Erro", "Não foi possível criar a conta.");
+    } catch (error) {
+      console.error("Erro ao criar conta:", error);
+
+      Alert.alert(
+        "Erro",
+        "Não foi possível criar a conta. Verifique os dados e tente novamente.",
+      );
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Criar conta</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Criar conta</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Nome"
-        placeholderTextColor="#94a3b8"
-        value={name}
-        onChangeText={setName}
-      />
+        <Input
+          placeholder="Nome"
+          value={name}
+          onChangeText={setName}
+          autoCapitalize="words"
+          autoCorrect={false}
+          textContentType="name"
+          editable={!loading}
+          returnKeyType="next"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        placeholderTextColor="#94a3b8"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
+        <Input
+          placeholder="E-mail"
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="email-address"
+          textContentType="emailAddress"
+          editable={!loading}
+          returnKeyType="next"
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        placeholderTextColor="#94a3b8"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <Input
+          placeholder="Senha"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+          autoCorrect={false}
+          textContentType="newPassword"
+          editable={!loading}
+          returnKeyType="done"
+          onSubmitEditing={handleRegister}
+        />
 
-      <Pressable style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Cadastrar</Text>
-      </Pressable>
+        <Text style={styles.passwordHint}>
+          Use no mínimo 8 caracteres, incluindo letra maiúscula, minúscula e
+          número.
+        </Text>
 
-      <Pressable onPress={() => router.push("/login")}>
-        <Text style={styles.link}>Já tenho uma conta</Text>
-      </Pressable>
-    </SafeAreaView>
+        <Button
+          title="Cadastrar"
+          loadingTitle="Cadastrando..."
+          loading={loading}
+          onPress={handleRegister}
+        />
+
+        <Pressable
+          style={styles.linkButton}
+          onPress={() => router.push("/login")}
+          disabled={loading}
+        >
+          <Text style={styles.link}>Já tenho uma conta</Text>
+        </Pressable>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -77,37 +139,28 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   title: {
-    color: "#fff",
+    color: "#ffffff",
     fontSize: 32,
     fontWeight: "700",
     marginBottom: 32,
     textAlign: "center",
   },
-  input: {
-    backgroundColor: "#1e293b",
-    color: "#fff",
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: "#334155",
+  passwordHint: {
+    color: "#94a3b8",
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: -2,
+    marginBottom: 8,
   },
-  button: {
-    backgroundColor: "#22c55e",
-    borderRadius: 12,
-    padding: 16,
+  linkButton: {
+    paddingVertical: 12,
     alignItems: "center",
-    marginTop: 8,
-  },
-  buttonText: {
-    color: "#052e16",
-    fontSize: 16,
-    fontWeight: "700",
   },
   link: {
     color: "#38bdf8",
     textAlign: "center",
-    marginTop: 24,
+    marginTop: 12,
     fontSize: 16,
+    fontWeight: "600",
   },
 });
