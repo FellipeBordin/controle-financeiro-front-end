@@ -15,3 +15,14 @@ export type RegisterResponse = {
   token: string;
   user: User;
 };
+
+export type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+export type AuthSession = {
+  token: string;
+  user: AuthUser;
+};

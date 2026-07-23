@@ -6,11 +6,13 @@ import { AuthLink } from "@/src/components/auth/AuthLink";
 import { AuthScreenLayout } from "@/src/components/auth/AuthScreenLayout";
 import { Button } from "@/src/components/common/Button";
 import { Input } from "@/src/components/common/input";
+import { useAuth } from "@/src/hooks/useAuth";
 import { loginUser } from "@/src/services/auth";
-import { saveAuthData } from "@/src/storage/auth-storage";
 import { normalizeEmail, validateLogin } from "@/src/utils/authValidators";
 
 export default function LoginScreen() {
+  const { signIn } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,7 +41,7 @@ export default function LoginScreen() {
         password,
       });
 
-      await saveAuthData(data.token, data.user);
+      await signIn(data.token, data.user);
 
       router.replace("/home");
     } catch (error) {
