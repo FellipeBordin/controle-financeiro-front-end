@@ -1,15 +1,9 @@
 import { useState } from "react";
-import {
-  Alert,
-  Keyboard,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { Alert, Keyboard, StyleSheet, Text } from "react-native";
 import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AuthLink } from "@/src/components/auth/AuthLink";
+import { AuthScreenLayout } from "@/src/components/auth/AuthScreenLayout";
 import { Button } from "@/src/components/common/Button";
 import { Input } from "@/src/components/common/input";
 import { registerUser } from "@/src/services/auth";
@@ -42,12 +36,9 @@ export default function RegisterScreen() {
       setLoading(true);
       Keyboard.dismiss();
 
-      const normalizedName = name.trim();
-      const normalizedEmail = normalizeEmail(email);
-
       const data = await registerUser({
-        name: normalizedName,
-        email: normalizedEmail,
+        name: name.trim(),
+        email: normalizeEmail(email),
         password,
       });
 
@@ -67,100 +58,73 @@ export default function RegisterScreen() {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Criar conta</Text>
-
-        <Input
-          placeholder="Nome"
-          value={name}
-          onChangeText={setName}
-          autoCapitalize="words"
-          autoCorrect={false}
-          textContentType="name"
-          editable={!loading}
-          returnKeyType="next"
-        />
-
-        <Input
-          placeholder="E-mail"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          editable={!loading}
-          returnKeyType="next"
-        />
-
-        <Input
-          placeholder="Senha"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="newPassword"
-          editable={!loading}
-          returnKeyType="done"
-          onSubmitEditing={handleRegister}
-        />
-
-        <Text style={styles.passwordHint}>
-          Use no mínimo 8 caracteres, incluindo letra maiúscula, minúscula e
-          número.
-        </Text>
-
-        <Button
-          title="Cadastrar"
-          loadingTitle="Cadastrando..."
-          loading={loading}
-          onPress={handleRegister}
-        />
-
-        <Pressable
-          style={styles.linkButton}
+    <AuthScreenLayout
+      title="Criar conta"
+      footer={
+        <AuthLink
+          text="Já tenho uma conta"
           onPress={() => router.push("/login")}
           disabled={loading}
-        >
-          <Text style={styles.link}>Já tenho uma conta</Text>
-        </Pressable>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+        />
+      }
+    >
+      <Input
+        placeholder="Nome"
+        value={name}
+        onChangeText={setName}
+        autoCapitalize="words"
+        autoCorrect={false}
+        textContentType="name"
+        editable={!loading}
+        returnKeyType="next"
+      />
+
+      <Input
+        placeholder="E-mail"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="email-address"
+        textContentType="emailAddress"
+        editable={!loading}
+        returnKeyType="next"
+      />
+
+      <Input
+        placeholder="Senha"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        autoCapitalize="none"
+        autoCorrect={false}
+        textContentType="newPassword"
+        editable={!loading}
+        returnKeyType="done"
+        onSubmitEditing={handleRegister}
+      />
+
+      <Text style={styles.passwordHint}>
+        Use no mínimo 8 caracteres, incluindo letra maiúscula, minúscula e
+        número.
+      </Text>
+
+      <Button
+        title="Cadastrar"
+        loadingTitle="Cadastrando..."
+        loading={loading}
+        onPress={handleRegister}
+      />
+    </AuthScreenLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0f172a",
-    padding: 24,
-    justifyContent: "center",
-  },
-  title: {
-    color: "#ffffff",
-    fontSize: 32,
-    fontWeight: "700",
-    marginBottom: 32,
-    textAlign: "center",
-  },
   passwordHint: {
     color: "#94a3b8",
     fontSize: 13,
     lineHeight: 18,
     marginTop: -2,
     marginBottom: 8,
-  },
-  linkButton: {
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  link: {
-    color: "#38bdf8",
-    textAlign: "center",
-    marginTop: 12,
-    fontSize: 16,
-    fontWeight: "600",
   },
 });

@@ -1,15 +1,9 @@
 import { useState } from "react";
-import {
-  Alert,
-  Keyboard,
-  Pressable,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { Alert, Keyboard } from "react-native";
 import { router } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { AuthLink } from "@/src/components/auth/AuthLink";
+import { AuthScreenLayout } from "@/src/components/auth/AuthScreenLayout";
 import { Button } from "@/src/components/common/Button";
 import { Input } from "@/src/components/common/input";
 import { loginUser } from "@/src/services/auth";
@@ -40,10 +34,8 @@ export default function LoginScreen() {
       setLoading(true);
       Keyboard.dismiss();
 
-      const normalizedEmail = normalizeEmail(email);
-
       const data = await loginUser({
-        email: normalizedEmail,
+        email: normalizeEmail(email),
         password,
       });
 
@@ -63,77 +55,47 @@ export default function LoginScreen() {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Entrar</Text>
-
-        <Input
-          placeholder="E-mail"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          editable={!loading}
-          returnKeyType="next"
-        />
-
-        <Input
-          placeholder="Senha"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
-          textContentType="password"
-          editable={!loading}
-          returnKeyType="done"
-          onSubmitEditing={handleLogin}
-        />
-
-        <Button
-          title="Entrar"
-          loadingTitle="Entrando..."
-          loading={loading}
-          onPress={handleLogin}
-        />
-
-        <Pressable
-          style={styles.linkButton}
+    <AuthScreenLayout
+      title="Entrar"
+      footer={
+        <AuthLink
+          text="Criar uma conta"
           onPress={() => router.push("/register")}
           disabled={loading}
-        >
-          <Text style={styles.link}>Criar uma conta</Text>
-        </Pressable>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+        />
+      }
+    >
+      <Input
+        placeholder="E-mail"
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        autoCorrect={false}
+        keyboardType="email-address"
+        textContentType="emailAddress"
+        editable={!loading}
+        returnKeyType="next"
+      />
+
+      <Input
+        placeholder="Senha"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+        autoCapitalize="none"
+        autoCorrect={false}
+        textContentType="password"
+        editable={!loading}
+        returnKeyType="done"
+        onSubmitEditing={handleLogin}
+      />
+
+      <Button
+        title="Entrar"
+        loadingTitle="Entrando..."
+        loading={loading}
+        onPress={handleLogin}
+      />
+    </AuthScreenLayout>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0f172a",
-    padding: 24,
-    justifyContent: "center",
-  },
-  title: {
-    color: "#ffffff",
-    fontSize: 32,
-    fontWeight: "700",
-    marginBottom: 32,
-    textAlign: "center",
-  },
-  linkButton: {
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-  link: {
-    color: "#38bdf8",
-    textAlign: "center",
-    marginTop: 12,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
