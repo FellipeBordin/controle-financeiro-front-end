@@ -6,11 +6,12 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
-  View,
+  TextInput
 } from "react-native";
 
+import { TransactionCategorySelector } from "@/src/components/Transactions/TransactionCategorySelector";
 import { TransactionTypeSelector } from "@/src/components/Transactions/TransactionTypeSelector";
+import { transactionCategories } from "@/src/constants/transactionCategories";
 import { createTransaction } from "@/src/services/transactions";
 import type { TransactionType } from "@/src/types/transaction";
 import { parseCurrency } from "@/src/utils/currency";
@@ -20,19 +21,6 @@ import {
 } from "@/src/utils/transactionValidators";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
-const transactionCategories: Record<TransactionType, string[]> = {
-  expense: [
-    "Alimentação",
-    "Transporte",
-    "Moradia",
-    "Saúde",
-    "Lazer",
-    "Educação",
-    "Outros",
-  ],
-  income: ["Salário", "Freelance", "Venda", "Investimentos", "Outros"],
-};
 
 export default function NewTransactionScreen() {
   const [type, setType] = useState<TransactionType>("expense");
@@ -121,30 +109,11 @@ export default function NewTransactionScreen() {
           onChangeText={setAmount}
         />
 
-        <Text style={styles.label}>Categoria</Text>
-
-        <View style={styles.categoriesContainer}>
-          {availableCategories.map((item) => (
-            <Pressable
-              key={item}
-              style={[
-                styles.categoryButton,
-                category === item && styles.categoryActive,
-              ]}
-              onPress={() => setCategory(item)}
-            >
-              <Text
-                style={[
-                  styles.categoryText,
-                  category === item && styles.categoryTextActive,
-                ]}
-              >
-                {item}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-
+        <TransactionCategorySelector 
+          categories={availableCategories}
+          value={category}
+          onChange={setCategory}
+        />  
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder="Observação opcional"
@@ -201,38 +170,7 @@ const styles = StyleSheet.create({
     minHeight: 96,
     textAlignVertical: "top",
   },
-  label: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 10,
-  },
-  categoriesContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 16,
-  },
-  categoryButton: {
-    backgroundColor: "#1e293b",
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: "#334155",
-  },
-  categoryActive: {
-    backgroundColor: "#38bdf8",
-    borderColor: "#38bdf8",
-  },
-  categoryText: {
-    color: "#cbd5e1",
-    fontWeight: "600",
-  },
-  categoryTextActive: {
-    color: "#082f49",
-  },
-  button: {
+    button: {
     backgroundColor: "#22c55e",
     borderRadius: 14,
     padding: 16,
