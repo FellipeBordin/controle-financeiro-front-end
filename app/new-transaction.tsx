@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -8,16 +9,17 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { router } from "expo-router";
 
+import { TransactionTypeSelector } from "@/src/components/Transactions/TransactionTypeSelector";
+import { createTransaction } from "@/src/services/transactions";
+import type { TransactionType } from "@/src/types/transaction";
 import { parseCurrency } from "@/src/utils/currency";
 import {
   validateTransaction,
   validateTransactionAmount,
 } from "@/src/utils/transactionValidators";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { createTransaction } from "@/src/services/transactions";
-import type { TransactionType } from "@/src/types/transaction";
+
 
 const transactionCategories: Record<TransactionType, string[]> = {
   expense: [
@@ -96,35 +98,11 @@ export default function NewTransactionScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Novo lançamento</Text>
 
-        <View style={styles.typeRow}>
-          <Pressable
-            style={[styles.typeButton, type === "expense" && styles.typeActive]}
-            onPress={() => handleChangeType("expense")}
-          >
-            <Text
-              style={[
-                styles.typeText,
-                type === "expense" && styles.typeTextActive,
-              ]}
-            >
-              Despesa
-            </Text>
-          </Pressable>
-
-          <Pressable
-            style={[styles.typeButton, type === "income" && styles.typeActive]}
-            onPress={() => handleChangeType("income")}
-          >
-            <Text
-              style={[
-                styles.typeText,
-                type === "income" && styles.typeTextActive,
-              ]}
-            >
-              Receita
-            </Text>
-          </Pressable>
-        </View>
+       <TransactionTypeSelector
+          value={type}
+          onChange={handleChangeType}
+        />
+          
 
         <TextInput
           style={styles.input}
@@ -210,32 +188,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 24,
   },
-  typeRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 16,
-  },
-  typeButton: {
-    flex: 1,
-    backgroundColor: "#1e293b",
-    borderRadius: 14,
-    padding: 14,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#334155",
-  },
-  typeActive: {
-    backgroundColor: "#22c55e",
-    borderColor: "#22c55e",
-  },
-  typeText: {
-    color: "#cbd5e1",
-    fontWeight: "700",
-  },
-  typeTextActive: {
-    color: "#052e16",
-  },
-  input: {
+   input: {
     backgroundColor: "#1e293b",
     color: "#fff",
     borderRadius: 14,
