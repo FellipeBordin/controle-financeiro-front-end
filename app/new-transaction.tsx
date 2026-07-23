@@ -1,96 +1,41 @@
 import { router } from "expo-router";
-import { useState } from "react";
+
 import {
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput
+  TextInput,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { TransactionCategorySelector } from "@/src/components/Transactions/TransactionCategorySelector";
 import { TransactionTypeSelector } from "@/src/components/Transactions/TransactionTypeSelector";
-import { transactionCategories } from "@/src/constants/transactionCategories";
-import { createTransaction } from "@/src/services/transactions";
-import type { TransactionType } from "@/src/types/transaction";
-import { parseCurrency } from "@/src/utils/currency";
-import {
-  validateTransaction,
-  validateTransactionAmount,
-} from "@/src/utils/transactionValidators";
-import { SafeAreaView } from "react-native-safe-area-context";
-
+import { useNewTransaction } from "@/src/hooks/useNewTransaction";
 
 export default function NewTransactionScreen() {
-  const [type, setType] = useState<TransactionType>("expense");
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState(transactionCategories.expense[0]);
-  const [notes, setNotes] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const availableCategories = transactionCategories[type];
-
-  function handleChangeType(newType: TransactionType) {
-    setType(newType);
-    setCategory(transactionCategories[newType][0]);
-  }
-
-  async function handleCreate() {
-    const validationError = validateTransaction({
-      title,
-      amount,
-      category,
-    });
-
-    if (validationError) {
-      Alert.alert("Atenção", validationError);
-      return;
-    }
-
-    const parsedAmount = parseCurrency(amount);
-
-    const amountError = validateTransactionAmount(parsedAmount);
-
-    if (amountError) {
-      Alert.alert("Atenção", amountError);
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      await createTransaction({
-        title: title.trim(),
-        amount: parsedAmount,
-        type,
-        category,
-        date: new Date().toISOString(),
-        notes: notes.trim(),
-      });
-
-      Alert.alert("Sucesso", "Lançamento cadastrado.");
-      router.replace("/home");
-    } catch (error) {
-      console.error("Erro ao cadastrar lançamento:", error);
-
-      Alert.alert("Erro", "Não foi possível cadastrar o lançamento.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const {
+    type,
+    title,
+    amount,
+    category,
+    notes,
+    loading,
+    availableCategories,
+    setTitle,
+    setAmount,
+    setCategory,
+    setNotes,
+    handleChangeType,
+    handleCreate,
+  } = useNewTransaction();
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Novo lançamento</Text>
 
-       <TransactionTypeSelector
-          value={type}
-          onChange={handleChangeType}
-        />
-          
+        <TransactionTypeSelector value={type} onChange={handleChangeType} />
 
         <TextInput
           style={styles.input}
@@ -109,11 +54,11 @@ export default function NewTransactionScreen() {
           onChangeText={setAmount}
         />
 
-        <TransactionCategorySelector 
+        <TransactionCategorySelector
           categories={availableCategories}
           value={category}
           onChange={setCategory}
-        />  
+        />
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder="Observação opcional"
@@ -157,7 +102,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 24,
   },
-   input: {
+  input: {
     backgroundColor: "#1e293b",
     color: "#fff",
     borderRadius: 14,
@@ -170,7 +115,7 @@ const styles = StyleSheet.create({
     minHeight: 96,
     textAlignVertical: "top",
   },
-    button: {
+  button: {
     backgroundColor: "#22c55e",
     borderRadius: 14,
     padding: 16,
