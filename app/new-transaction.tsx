@@ -9,56 +9,85 @@ import {
   View,
 } from "react-native";
 import { router } from "expo-router";
+
+import { parseCurrency } from "@/src/utils/currency";
+import {
+  validateTransaction,
+  validateTransactionAmount,
+} from "@/src/utils/transactionValidators";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { createTransaction } from "@/src/services/transactions";
 import type { TransactionType } from "@/src/types/transaction";
 
-const categories = [
-  "Alimentação",
-  "Transporte",
-  "Moradia",
-  "Saúde",
-  "Lazer",
-  "Educação",
-  "Salário",
-  "Outros",
-];
+const transactionCategories: Record<TransactionType, string[]> = {
+  expense: [
+    "Alimentação",
+    "Transporte",
+    "Moradia",
+    "Saúde",
+    "Lazer",
+    "Educação",
+    "Outros",
+  ],
+  income: ["Salário", "Freelance", "Venda", "Investimentos", "Outros"],
+};
 
 export default function NewTransactionScreen() {
   const [type, setType] = useState<TransactionType>("expense");
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("Alimentação");
+  const [category, setCategory] = useState(transactionCategories.expense[0]);
   const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const availableCategories = transactionCategories[type];
+
+  function handleChangeType(newType: TransactionType) {
+    setType(newType);
+    setCategory(transactionCategories[newType][0]);
+  }
 
   async function handleCreate() {
+    const validationError = validateTransaction({
+      title,
+      amount,
+      category,
+    });
+
+    if (validationError) {
+      Alert.alert("Atenção", validationError);
+      return;
+    }
+
+    const parsedAmount = parseCurrency(amount);
+
+    const amountError = validateTransactionAmount(parsedAmount);
+
+    if (amountError) {
+      Alert.alert("Atenção", amountError);
+      return;
+    }
+
     try {
-      const parsedAmount = Number(amount.replace(",", "."));
-
-      if (!title || !amount || !category) {
-        Alert.alert("Atenção", "Preencha título, valor e categoria.");
-        return;
-      }
-
-      if (Number.isNaN(parsedAmount) || parsedAmount <= 0) {
-        Alert.alert("Atenção", "Informe um valor válido.");
-        return;
-      }
+      setLoading(true);
 
       await createTransaction({
-        title,
+        title: title.trim(),
         amount: parsedAmount,
         type,
         category,
         date: new Date().toISOString(),
-        notes,
+        notes: notes.trim(),
       });
 
       Alert.alert("Sucesso", "Lançamento cadastrado.");
       router.replace("/home");
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
+      console.error("Erro ao cadastrar lançamento:", error);
+
       Alert.alert("Erro", "Não foi possível cadastrar o lançamento.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -70,7 +99,7 @@ export default function NewTransactionScreen() {
         <View style={styles.typeRow}>
           <Pressable
             style={[styles.typeButton, type === "expense" && styles.typeActive]}
-            onPress={() => setType("expense")}
+            onPress={() => handleChangeType("expense")}
           >
             <Text
               style={[
@@ -84,7 +113,7 @@ export default function NewTransactionScreen() {
 
           <Pressable
             style={[styles.typeButton, type === "income" && styles.typeActive]}
-            onPress={() => setType("income")}
+            onPress={() => handleChangeType("income")}
           >
             <Text
               style={[
@@ -117,7 +146,7 @@ export default function NewTransactionScreen() {
         <Text style={styles.label}>Categoria</Text>
 
         <View style={styles.categoriesContainer}>
-          {categories.map((item) => (
+          {availableCategories.map((item) => (
             <Pressable
               key={item}
               style={[
@@ -147,8 +176,14 @@ export default function NewTransactionScreen() {
           multiline
         />
 
-        <Pressable style={styles.button} onPress={handleCreate}>
-          <Text style={styles.buttonText}>Salvar lançamento</Text>
+        <Pressable
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleCreate}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Salvando..." : "Salvar lançamento"}
+          </Text>
         </Pressable>
 
         <Pressable style={styles.cancelButton} onPress={() => router.back()}>
@@ -164,6 +199,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#0f172a",
     padding: 20,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   title: {
     color: "#fff",
