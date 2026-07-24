@@ -10,6 +10,7 @@ import {
   validateTransaction,
   validateTransactionAmount,
 } from "@/src/utils/transactionValidators";
+import { getApiErrorMessage } from "../utils/getApiErrorMessage";
 
 export function useNewTransaction() {
   const [type, setType] = useState<TransactionType>("expense");
@@ -61,11 +62,16 @@ export function useNewTransaction() {
 
       Alert.alert("Sucesso", "Lançamento cadastrado.");
       router.replace("/home");
-    } catch (error) {
-      console.error("Erro ao cadastrar lançamento:", error);
+   } catch (error) {
+  console.error("Erro ao cadastrar lançamento:", error);
 
-      Alert.alert("Erro", "Não foi possível cadastrar o lançamento.");
-    } finally {
+  const message = getApiErrorMessage(
+    error,
+    "Não foi possível cadastrar o lançamento.",
+  );
+
+  Alert.alert("Erro", message);
+}finally {
       setLoading(false);
     }
   }

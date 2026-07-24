@@ -1,10 +1,12 @@
-import { api } from "./api";
 import type {
+  Transaction,
   TransactionType,
   TransactionsResponse,
 } from "@/src/types/transaction";
 
-type CreateTransactionPayload = {
+import { api } from "./api";
+
+export type CreateTransactionPayload = {
   title: string;
   amount: number;
   type: TransactionType;
@@ -13,17 +15,35 @@ type CreateTransactionPayload = {
   notes?: string;
 };
 
-export async function getTransactions() {
-  const response = await api.get<TransactionsResponse>("/api/transactions");
+type DeleteTransactionResponse = {
+  message: string;
+};
+
+export async function getTransactions(): Promise<TransactionsResponse> {
+  const response = await api.get<TransactionsResponse>(
+    "/api/transactions",
+  );
+
   return response.data;
 }
 
-export async function createTransaction(payload: CreateTransactionPayload) {
-  const response = await api.post("/api/transactions", payload);
+export async function createTransaction(
+  payload: CreateTransactionPayload,
+): Promise<Transaction> {
+  const response = await api.post<Transaction>(
+    "/api/transactions",
+    payload,
+  );
+
   return response.data;
 }
 
-export async function deleteTransaction(id: string) {
-  const response = await api.delete(`/api/transactions/${id}`);
+export async function deleteTransaction(
+  id: string,
+): Promise<DeleteTransactionResponse> {
+  const response = await api.delete<DeleteTransactionResponse>(
+    `/api/transactions/${id}`,
+  );
+
   return response.data;
 }

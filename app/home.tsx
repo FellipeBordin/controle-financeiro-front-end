@@ -1,3 +1,13 @@
+import { getInsights } from "@/src/services/ai";
+import {
+  deleteTransaction,
+  getTransactions,
+} from "@/src/services/transactions";
+import { clearAuthData } from "@/src/storage/auth-storage";
+import type { Transaction } from "@/src/types/transaction";
+import { getCurrentMonth } from "@/src/utils/date";
+import { getApiErrorMessage } from "@/src/utils/getApiErrorMessage";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Alert,
@@ -8,16 +18,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { router, useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { clearAuthData } from "@/src/storage/auth-storage";
-import {
-  deleteTransaction,
-  getTransactions,
-} from "@/src/services/transactions";
-import { getInsights } from "@/src/services/ai";
-import { getCurrentMonth } from "@/src/utils/date";
-import type { Transaction } from "@/src/types/transaction";
 
 type Summary = {
   totalIncome: number;
@@ -74,16 +75,38 @@ export default function HomeScreen() {
   const latestTransactions = transactions.slice(0, 6);
 
   async function handleDeleteTransaction(id: string) {
-    try {
-      await deleteTransaction(id);
+  Alert.alert(
+    "Excluir lançamento",
+    "Deseja realmente excluir este lançamento?",
+    [
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
+      {
+        text: "Excluir",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await deleteTransaction(id);
 
-      Alert.alert("Sucesso", "Lançamento excluído");
-      await loadData();
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Erro", "Falha ao excluir");
-    }
-  }
+            Alert.alert("Sucesso", "Lançamento excluído.");
+            await loadData();
+          } catch (error) {
+            console.error("Erro ao excluir lançamento:", error);
+
+            const message = getApiErrorMessage(
+              error,
+              "Não foi possível excluir o lançamento.",
+            );
+
+            Alert.alert("Erro", message);
+          }
+        },
+      },
+    ],
+  );
+}
 
   return (
     <SafeAreaView style={styles.container}>
