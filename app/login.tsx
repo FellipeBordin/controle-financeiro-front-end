@@ -1,6 +1,6 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Keyboard } from "react-native";
-import { router } from "expo-router";
 
 import { AuthLink } from "@/src/components/auth/AuthLink";
 import { AuthScreenLayout } from "@/src/components/auth/AuthScreenLayout";
@@ -9,6 +9,7 @@ import { Input } from "@/src/components/common/input";
 import { useAuth } from "@/src/hooks/useAuth";
 import { loginUser } from "@/src/services/auth";
 import { normalizeEmail, validateLogin } from "@/src/utils/authValidators";
+import { getApiErrorMessage } from "@/src/utils/getApiErrorMessage";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
@@ -44,14 +45,17 @@ export default function LoginScreen() {
       await signIn(data.token, data.user);
 
       router.replace("/home");
-    } catch (error) {
-      console.error("Erro ao fazer login:", error);
+    }  catch (error) {
+  console.error("Erro ao fazer login:", error);
 
-      Alert.alert(
-        "Erro",
-        "Não foi possível fazer login. Verifique seus dados e tente novamente.",
-      );
-    } finally {
+  const message = getApiErrorMessage(
+    error,
+    "Não foi possível fazer login.",
+  );
+
+  Alert.alert("Erro", message);
+} 
+     finally {
       setLoading(false);
     }
   }

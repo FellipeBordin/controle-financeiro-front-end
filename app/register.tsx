@@ -1,6 +1,6 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Keyboard, StyleSheet, Text } from "react-native";
-import { router } from "expo-router";
 
 import { AuthLink } from "@/src/components/auth/AuthLink";
 import { AuthScreenLayout } from "@/src/components/auth/AuthScreenLayout";
@@ -9,6 +9,7 @@ import { Input } from "@/src/components/common/input";
 import { registerUser } from "@/src/services/auth";
 import { saveAuthData } from "@/src/storage/auth-storage";
 import { normalizeEmail, validateRegister } from "@/src/utils/authValidators";
+import { getApiErrorMessage } from "@/src/utils/getApiErrorMessage";
 
 export default function RegisterScreen() {
   const [name, setName] = useState("");
@@ -45,14 +46,16 @@ export default function RegisterScreen() {
       await saveAuthData(data.token, data.user);
 
       router.replace("/home");
-    } catch (error) {
-      console.error("Erro ao criar conta:", error);
+    }  catch (error) {
+  console.error("Erro ao criar conta:", error);
 
-      Alert.alert(
-        "Erro",
-        "Não foi possível criar a conta. Verifique os dados e tente novamente.",
-      );
-    } finally {
+  const message = getApiErrorMessage(
+    error,
+    "Não foi possível criar sua conta.",
+  );
+
+  Alert.alert("Erro", message);
+}finally {
       setLoading(false);
     }
   }

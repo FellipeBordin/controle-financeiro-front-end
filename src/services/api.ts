@@ -5,6 +5,7 @@ export const API_URL = "https://controle-financeiro-api-vert.vercel.app";
 
 export const api = axios.create({
   baseURL: API_URL,
+  timeout: 15000,
 });
 
 api.interceptors.request.use(async (config) => {
