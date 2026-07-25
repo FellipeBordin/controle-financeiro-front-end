@@ -1,9 +1,9 @@
+import { useAuth } from "@/src/hooks/useAuth";
 import { getInsights } from "@/src/services/ai";
 import {
   deleteTransaction,
   getTransactions,
 } from "@/src/services/transactions";
-import { clearAuthData } from "@/src/storage/auth-storage";
 import type { Transaction } from "@/src/types/transaction";
 import { getCurrentMonth } from "@/src/utils/date";
 import { getApiErrorMessage } from "@/src/utils/getApiErrorMessage";
@@ -66,11 +66,11 @@ export default function HomeScreen() {
       loadData();
     }, []),
   );
-
-  async function handleLogout() {
-    await clearAuthData();
-    router.replace("/login");
-  }
+  const { signOut } = useAuth();
+ async function handleLogout() {
+  await signOut();
+  router.replace("/login");
+}
 
   const latestTransactions = transactions.slice(0, 6);
 
