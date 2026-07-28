@@ -1,12 +1,15 @@
-import axios from "axios";
+import { isAxiosError } from "axios";
 
-import type { ApiErrorResponse } from "@/src/types/api";
+type ApiErrorResponse = {
+  message?: string;
+  error?: string;
+};
 
 export function getApiErrorMessage(
   error: unknown,
   fallbackMessage = "Ocorreu um erro inesperado.",
 ): string {
-  if (!axios.isAxiosError<ApiErrorResponse>(error)) {
+  if (!isAxiosError<ApiErrorResponse>(error)) {
     return fallbackMessage;
   }
 
@@ -16,6 +19,14 @@ export function getApiErrorMessage(
 
   if (!error.response) {
     return "Não foi possível conectar ao servidor.";
+  }
+
+  if (error.response.status === 401) {
+    return (
+      error.response.data?.message ??
+      error.response.data?.error ??
+      "E-mail ou senha inválidos."
+    );
   }
 
   return (

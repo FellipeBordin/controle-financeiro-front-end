@@ -10,11 +10,13 @@ export type Transaction = {
   notes?: string | null;
 };
 
+export type TransactionSummary = {
+  totalIncome: number;
+  totalExpense: number;
+  balance: number;
+};
+
 export type TransactionsResponse = {
   transactions: Transaction[];
-  summary: {
-    totalIncome: number;
-    totalExpense: number;
-    balance: number;
-  };
+  summary: TransactionSummary;
 };

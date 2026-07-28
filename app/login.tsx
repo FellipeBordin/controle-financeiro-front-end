@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, Keyboard } from "react-native";
+import { Alert, Keyboard, Platform } from "react-native";
 
 import { AuthLink } from "@/src/components/auth/AuthLink";
 import { AuthScreenLayout } from "@/src/components/auth/AuthScreenLayout";
@@ -18,6 +18,15 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  function showMessage(title: string, message: string) {
+    if (Platform.OS === "web") {
+      window.alert(`${title}\n\n${message}`);
+      return;
+    }
+
+    Alert.alert(title, message);
+  }
+
   async function handleLogin() {
     if (loading) {
       return;
@@ -29,7 +38,7 @@ export default function LoginScreen() {
     });
 
     if (validationError) {
-      Alert.alert("Atenção", validationError);
+      showMessage("Atenção", validationError);
       return;
     }
 
@@ -45,17 +54,13 @@ export default function LoginScreen() {
       await signIn(data.token, data.user);
 
       router.replace("/home");
-    }  catch (error) {
-  console.error("Erro ao fazer login:", error);
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
 
-  const message = getApiErrorMessage(
-    error,
-    "Não foi possível fazer login.",
-  );
+      const message = getApiErrorMessage(error, "E-mail ou senha inválidos.");
 
-  Alert.alert("Erro", message);
-} 
-     finally {
+      showMessage("Erro ao entrar", message);
+    } finally {
       setLoading(false);
     }
   }

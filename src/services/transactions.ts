@@ -1,49 +1,64 @@
+import { api } from "@/src/services/api";
 import type {
   Transaction,
+  TransactionSummary,
   TransactionType,
-  TransactionsResponse,
 } from "@/src/types/transaction";
 
-import { api } from "./api";
-
-export type CreateTransactionPayload = {
-  title: string;
-  amount: number;
-  type: TransactionType;
-  category: string;
-  date: string;
-  notes?: string;
+type TransactionsResponse = {
+  transactions: Transaction[];
+  summary: TransactionSummary;
 };
 
-type DeleteTransactionResponse = {
-  message: string;
+type CreateTransactionData = {
+  title: string;
+  amount: number;
+  category: string;
+  type: TransactionType;
+};
+
+type UpdateTransactionData = {
+  title: string;
+  amount: number;
+  category: string;
+  type: TransactionType;
 };
 
 export async function getTransactions(): Promise<TransactionsResponse> {
-  const response = await api.get<TransactionsResponse>(
-    "/api/transactions",
-  );
+  const response = await api.get<TransactionsResponse>("/api/transactions");
 
   return response.data;
+}
+
+export async function getTransactionById(id: string): Promise<Transaction> {
+  const data = await getTransactions();
+
+  const transaction = data.transactions.find((item) => item.id === id);
+
+  if (!transaction) {
+    throw new Error("Lançamento não encontrado.");
+  }
+
+  return transaction;
 }
 
 export async function createTransaction(
-  payload: CreateTransactionPayload,
+  data: CreateTransactionData,
 ): Promise<Transaction> {
-  const response = await api.post<Transaction>(
-    "/api/transactions",
-    payload,
-  );
+  const response = await api.post<Transaction>("/api/transactions", data);
 
   return response.data;
 }
 
-export async function deleteTransaction(
+export async function updateTransaction(
   id: string,
-): Promise<DeleteTransactionResponse> {
-  const response = await api.delete<DeleteTransactionResponse>(
-    `/api/transactions/${id}`,
-  );
+  data: UpdateTransactionData,
+): Promise<Transaction> {
+  const response = await api.put<Transaction>(`/api/transactions/${id}`, data);
 
   return response.data;
+}
+
+export async function deleteTransaction(id: string): Promise<void> {
+  await api.delete(`/api/transactions/${id}`);
 }
