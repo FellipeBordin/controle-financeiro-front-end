@@ -1,30 +1,30 @@
+import type { TransactionFormErrors } from "@/src/types/transactionForm";
 import { router } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert, Platform } from "react-native";
 
-import { transactionCategories } from "@/src/constants/transactionCategories";
-import { createTransaction } from "@/src/services/transactions";
+import {
+  getTransactionById,
+  updateTransaction,
+} from "@/src/services/transactions";
 import type { TransactionType } from "@/src/types/transaction";
 import { formatCurrency, parseCurrency } from "@/src/utils/currency";
 import { getApiErrorMessage } from "@/src/utils/getApiErrorMessage";
 
-export type TransactionFormErrors = {
-  title?: string;
-  amount?: string;
-  category?: string;
+type UseEditTransactionParams = {
+  id?: string;
 };
 
-export function useNewTransaction() {
-  const [type, setType] = useState<TransactionType>("expense");
+export function useEditTransaction({ id }: UseEditTransactionParams) {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState(transactionCategories.expense[0]);
-  const [notes, setNotes] = useState("");
+  const [category, setCategory] = useState("");
+  const [type, setType] = useState<TransactionType>("expense");
 
   const [errors, setErrors] = useState<TransactionFormErrors>({});
-  const [loading, setLoading] = useState(false);
 
-  const availableCategories = transactionCategories[type];
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   const showMessage = useCallback((messageTitle: string, message: string) => {
     if (Platform.OS === "web") {
@@ -34,6 +34,42 @@ export function useNewTransaction() {
 
     Alert.alert(messageTitle, message);
   }, []);
+
+  const loadTransaction = useCallback(async () => {
+    if (!id) {
+      showMessage("Erro", "O lançamento não foi encontrado.");
+
+      router.back();
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const transaction = await getTransactionById(id);
+
+      setTitle(transaction.title);
+      setCategory(transaction.category);
+      setType(transaction.type);
+      setAmount(formatCurrency(transaction.amount));
+    } catch (error) {
+      console.error("Erro ao carregar lançamento:", error);
+
+      const message = getApiErrorMessage(
+        error,
+        "Não foi possível carregar o lançamento.",
+      );
+
+      showMessage("Erro", message);
+      router.back();
+    } finally {
+      setLoading(false);
+    }
+  }, [id, showMessage]);
+
+  useEffect(() => {
+    void loadTransaction();
+  }, [loadTransaction]);
 
   function clearError(field: keyof TransactionFormErrors) {
     if (!errors[field]) {
@@ -51,6 +87,11 @@ export function useNewTransaction() {
     clearError("title");
   }
 
+  function handleChangeCategory(value: string) {
+    setCategory(value);
+    clearError("category");
+  }
+
   function handleChangeAmount(value: string) {
     const digits = value.replace(/\D/g, "");
 
@@ -66,18 +107,6 @@ export function useNewTransaction() {
     clearError("amount");
   }
 
-  function handleChangeCategory(value: string) {
-    setCategory(value);
-    clearError("category");
-  }
-
-  function handleChangeType(newType: TransactionType) {
-    setType(newType);
-    setCategory(transactionCategories[newType][0]);
-
-    clearError("category");
-  }
-
   function validateForm(): boolean {
     const newErrors: TransactionFormErrors = {};
 
@@ -85,9 +114,9 @@ export function useNewTransaction() {
       newErrors.title = "Informe o título.";
     }
 
-    const parsedAmount = parseCurrency(amount);
+    const numericAmount = parseCurrency(amount);
 
-    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+    if (!Number.isFinite(numericAmount) || numericAmount <= 0) {
       newErrors.amount = "Informe um valor válido.";
     }
 
@@ -100,8 +129,8 @@ export function useNewTransaction() {
     return Object.keys(newErrors).length === 0;
   }
 
-  async function handleCreate() {
-    if (loading) {
+  async function handleSubmit() {
+    if (!id || saving) {
       return;
     }
 
@@ -110,49 +139,45 @@ export function useNewTransaction() {
     }
 
     try {
-      setLoading(true);
+      setSaving(true);
 
-      await createTransaction({
+      await updateTransaction(id, {
         title: title.trim(),
         amount: parseCurrency(amount),
-        type,
         category: category.trim(),
-        date: new Date().toISOString(),
-        notes: notes.trim(),
+        type,
       });
 
-      showMessage("Sucesso", "Lançamento cadastrado com sucesso.");
+      showMessage("Sucesso", "Lançamento atualizado com sucesso.");
 
-      router.replace("/home");
+      router.back();
     } catch (error) {
-      console.error("Erro ao cadastrar lançamento:", error);
+      console.error("Erro ao atualizar lançamento:", error);
 
       const message = getApiErrorMessage(
         error,
-        "Não foi possível cadastrar o lançamento.",
+        "Não foi possível atualizar o lançamento.",
       );
 
       showMessage("Erro", message);
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   }
 
   return {
-    type,
     title,
     amount,
     category,
-    notes,
+    type,
     errors,
     loading,
-    availableCategories,
+    saving,
 
-    setNotes,
+    setType,
     handleChangeTitle,
     handleChangeAmount,
     handleChangeCategory,
-    handleChangeType,
-    handleCreate,
+    handleSubmit,
   };
 }

@@ -15,6 +15,8 @@ type CreateTransactionData = {
   amount: number;
   category: string;
   type: TransactionType;
+  date: string;
+  notes?: string;
 };
 
 type UpdateTransactionData = {
