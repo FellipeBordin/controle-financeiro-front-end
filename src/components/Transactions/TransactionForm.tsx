@@ -7,10 +7,11 @@ import {
   View,
 } from "react-native";
 
-import { TransactionFormErrors } from "@/src/types/transactionForm";
 import { TransactionCategorySelector } from "@/src/components/Transactions/TransactionCategorySelector";
 import { TransactionTypeSelector } from "@/src/components/Transactions/TransactionTypeSelector";
+import { colors, radius, spacing, typography } from "@/src/theme";
 import type { TransactionType } from "@/src/types/transaction";
+import { TransactionFormErrors } from "@/src/types/transactionForm";
 
 type TransactionFormProps = {
   title: string;
@@ -229,52 +230,52 @@ export function TransactionForm({
 
 const styles = StyleSheet.create({
   form: {
-    backgroundColor: "#0f172a",
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#334155",
-    borderRadius: 22,
-    padding: 18,
-    gap: 20,
+    borderColor: colors.border,
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+    gap: spacing.lg,
   },
 
   field: {
-    gap: 8,
+    gap: spacing.sm,
   },
 
   label: {
-    color: "#e2e8f0",
-    fontSize: 14,
+    color: colors.text,
+    fontSize: typography.caption,
     fontWeight: "800",
   },
 
   input: {
     minHeight: 52,
-    backgroundColor: "#1e293b",
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: "#334155",
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    color: "#f8fafc",
-    fontSize: 16,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    color: colors.text,
+    fontSize: typography.body,
   },
 
   textArea: {
     minHeight: 96,
-    paddingTop: 14,
+    paddingTop: spacing.md,
   },
 
   inputError: {
-    borderColor: "#ef4444",
+    borderColor: colors.danger,
   },
 
   errorText: {
-    color: "#f87171",
+    color: colors.danger,
     fontSize: 12,
   },
 
   typeContainer: {
     flexDirection: "row",
-    gap: 10,
+    gap: spacing.sm,
   },
 
   typeButton: {
@@ -282,50 +283,50 @@ const styles = StyleSheet.create({
     minHeight: 48,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#1e293b",
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: "#334155",
-    borderRadius: 12,
+    borderColor: colors.border,
+    borderRadius: radius.md,
   },
 
   incomeButtonSelected: {
     backgroundColor: "#166534",
-    borderColor: "#22c55e",
+    borderColor: colors.success,
   },
 
   expenseButtonSelected: {
     backgroundColor: "#7f1d1d",
-    borderColor: "#ef4444",
+    borderColor: colors.danger,
   },
 
   typeButtonText: {
-    color: "#94a3b8",
-    fontSize: 14,
+    color: colors.textSecondary,
+    fontSize: typography.caption,
     fontWeight: "800",
   },
 
   typeButtonTextSelected: {
-    color: "#ffffff",
+    color: colors.text,
   },
 
   saveButton: {
     minHeight: 52,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#2563eb",
-    borderRadius: 12,
-    marginTop: 4,
+    backgroundColor: colors.primary,
+    borderRadius: radius.md,
+    marginTop: spacing.xs,
   },
 
   loadingContent: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: spacing.sm,
   },
 
   saveButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
+    color: colors.text,
+    fontSize: typography.body,
     fontWeight: "900",
   },
 
@@ -333,14 +334,14 @@ const styles = StyleSheet.create({
     minHeight: 48,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#1e293b",
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: "#334155",
-    borderRadius: 12,
+    borderColor: colors.border,
+    borderRadius: radius.md,
   },
 
   cancelButtonText: {
-    color: "#cbd5e1",
+    color: colors.textSecondary,
     fontSize: 15,
     fontWeight: "800",
   },

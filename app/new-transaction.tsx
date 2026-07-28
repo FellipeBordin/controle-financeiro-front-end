@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { TransactionForm } from "@/src/components/Transactions/TransactionForm";
 import { useNewTransaction } from "@/src/hooks/useNewTransaction";
+import { colors, spacing, typography } from "@/src/theme";
 
 export default function NewTransactionScreen() {
   const {
@@ -79,7 +80,7 @@ export default function NewTransactionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#020617",
+    backgroundColor: colors.background,
   },
 
   keyboardContainer: {
@@ -88,22 +89,22 @@ const styles = StyleSheet.create({
 
   content: {
     flexGrow: 1,
-    padding: 20,
-    paddingBottom: 40,
+    padding: spacing.lg,
+    paddingBottom: spacing.xl,
   },
 
   title: {
-    color: "#f8fafc",
-    fontSize: 28,
+    color: colors.text,
+    fontSize: typography.title,
     fontWeight: "900",
-    marginTop: 16,
+    marginTop: spacing.md,
   },
 
   subtitle: {
-    color: "#94a3b8",
-    fontSize: 14,
+    color: colors.textSecondary,
+    fontSize: typography.caption,
     lineHeight: 20,
-    marginTop: 6,
-    marginBottom: 28,
+    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
   },
 });

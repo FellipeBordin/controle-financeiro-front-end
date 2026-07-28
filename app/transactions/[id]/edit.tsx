@@ -3,16 +3,16 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { TransactionForm } from "@/src/components/Transactions/TransactionForm";
 import { useEditTransaction } from "@/src/hooks/useEditTransaction";
+import { colors, spacing, typography } from "@/src/theme";
 
 export default function EditTransactionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -36,9 +36,14 @@ export default function EditTransactionScreen() {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" />
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+          />
 
-          <Text style={styles.loadingText}>Carregando lançamento...</Text>
+          <Text style={styles.loadingText}>
+            Carregando lançamento...
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -52,29 +57,14 @@ export default function EditTransactionScreen() {
       >
         <ScrollView
           contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.header}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.backButton,
-                pressed && styles.buttonPressed,
-              ]}
-              onPress={() => router.back()}
-              disabled={saving}
-            >
-              <Text style={styles.backButtonText}>Voltar</Text>
-            </Pressable>
+          <Text style={styles.title}>Editar lançamento</Text>
 
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.title}>Editar lançamento</Text>
-
-              <Text style={styles.subtitle}>
-                Atualize os dados da receita ou despesa.
-              </Text>
-            </View>
-          </View>
+          <Text style={styles.subtitle}>
+            Atualize os dados da receita ou despesa.
+          </Text>
 
           <TransactionForm
             title={title}
@@ -103,7 +93,7 @@ export default function EditTransactionScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#020617",
+    backgroundColor: colors.background,
   },
 
   keyboardContainer: {
@@ -112,60 +102,34 @@ const styles = StyleSheet.create({
 
   content: {
     flexGrow: 1,
-    padding: 20,
-    paddingBottom: 40,
+    padding: spacing.lg,
+    paddingBottom: spacing.xl,
+  },
+
+  title: {
+    color: colors.text,
+    fontSize: typography.title,
+    fontWeight: "900",
+    marginTop: spacing.md,
+  },
+
+  subtitle: {
+    color: colors.textSecondary,
+    fontSize: typography.caption,
+    lineHeight: 20,
+    marginTop: spacing.xs,
+    marginBottom: spacing.lg,
   },
 
   loadingContainer: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
-    gap: 12,
+    justifyContent: "center",
+    gap: spacing.md,
   },
 
   loadingText: {
-    color: "#94a3b8",
-    fontSize: 14,
-  },
-
-  header: {
-    marginBottom: 28,
-  },
-
-  backButton: {
-    alignSelf: "flex-start",
-    backgroundColor: "#1e293b",
-    borderWidth: 1,
-    borderColor: "#334155",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 9,
-    marginBottom: 20,
-  },
-
-  backButtonText: {
-    color: "#f8fafc",
-    fontSize: 14,
-    fontWeight: "700",
-  },
-
-  headerTextContainer: {
-    gap: 6,
-  },
-
-  title: {
-    color: "#f8fafc",
-    fontSize: 28,
-    fontWeight: "900",
-  },
-
-  subtitle: {
-    color: "#94a3b8",
-    fontSize: 14,
-    lineHeight: 20,
-  },
-
-  buttonPressed: {
-    opacity: 0.75,
+    color: colors.textSecondary,
+    fontSize: typography.body,
   },
 });

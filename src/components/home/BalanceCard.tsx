@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { colors, radius, spacing, typography } from "@/src/theme";
 import type { TransactionSummary } from "@/src/types/transaction";
 import { formatCurrency } from "@/src/utils/currency";
 
@@ -24,6 +25,7 @@ export function BalanceCard({ summary }: BalanceCardProps) {
       <View style={styles.balanceDetails}>
         <View>
           <Text style={styles.detailLabel}>Receitas</Text>
+
           <Text style={styles.incomeText}>
             {formatCurrency(summary.totalIncome)}
           </Text>
@@ -31,6 +33,7 @@ export function BalanceCard({ summary }: BalanceCardProps) {
 
         <View>
           <Text style={styles.detailLabel}>Despesas</Text>
+
           <Text style={styles.expenseText}>
             {formatCurrency(summary.totalExpense)}
           </Text>
@@ -41,45 +44,52 @@ export function BalanceCard({ summary }: BalanceCardProps) {
 }
 
 const styles = StyleSheet.create({
-  balanceCard: {
-    backgroundColor: "#16a34a",
-    borderRadius: 28,
-    padding: 22,
-    marginBottom: 16,
-  },
+ balanceCard: {
+  backgroundColor: colors.successStrong,
+  borderRadius: radius.card,
+  padding: spacing.lg,
+  marginBottom: spacing.md,
+},
+
   cardLabel: {
-    color: "#dcfce7",
-    fontSize: 14,
+    color: colors.successLight,
+    fontSize: typography.caption,
     fontWeight: "700",
-    marginBottom: 6,
+    marginBottom: spacing.xs,
   },
+
   balanceText: {
-    color: "#ffffff",
+    color: colors.text,
     fontSize: 34,
     fontWeight: "900",
   },
+
   negativeBalance: {
-    color: "#fee2e2",
+    color: colors.dangerLight,
   },
+
   balanceDetails: {
-    marginTop: 22,
-    paddingTop: 18,
+    marginTop: spacing.lg,
+    paddingTop: spacing.md,
     borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.25)",
+    borderTopColor: colors.whiteTransparent,
     flexDirection: "row",
     justifyContent: "space-between",
   },
+
   detailLabel: {
-    color: "#dcfce7",
+    color: colors.successLight,
     fontSize: 13,
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
+
   incomeText: {
-    color: "#22c55e",
+    color: colors.success,
     fontWeight: "900",
   },
+
   expenseText: {
-    color: "#ef4444",
+    color: colors.danger,
     fontWeight: "900",
   },
 });
