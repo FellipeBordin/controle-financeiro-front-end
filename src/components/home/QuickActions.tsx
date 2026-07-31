@@ -1,5 +1,46 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import { colors, radius, spacing } from "@/src/theme";
+
+type ActionItem = {
+  label: string;
+  route:
+    | "/new-transaction"
+    | "/goals"
+    | "/monthly-plan"
+    | "/notifications";
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  color: string;
+};
+
+const actions: ActionItem[] = [
+  {
+    label: "Novo lançamento",
+    route: "/new-transaction",
+    icon: "plus-circle",
+    color: colors.primary,
+  },
+  {
+    label: "Metas",
+    route: "/goals",
+    icon: "target",
+    color: colors.success,
+  },
+  {
+    label: "Planejamento",
+    route: "/monthly-plan",
+    icon: "chart-box-outline",
+    color: colors.primary,
+  },
+  {
+    label: "Alertas",
+    route: "/notifications",
+    icon: "bell-outline",
+    color: colors.danger,
+  },
+];
 
 export function QuickActions() {
   return (
@@ -7,37 +48,25 @@ export function QuickActions() {
       <Text style={styles.sectionTitle}>Ações rápidas</Text>
 
       <View style={styles.actionsGrid}>
-        <Pressable
-          style={styles.actionButton}
-          onPress={() => router.push("/new-transaction")}
-        >
-          <Text style={styles.actionIcon}>＋</Text>
-          <Text style={styles.actionText}>Novo lançamento</Text>
-        </Pressable>
+        {actions.map((action) => (
+          <Pressable
+            key={action.route}
+            style={({ pressed }) => [
+              styles.actionButton,
+              pressed && styles.buttonPressed,
+            ]}
+            onPress={() => router.push(action.route)}
+          >
+            <MaterialCommunityIcons
+              name={action.icon}
+              size={30}
+              color={action.color}
+              style={styles.actionIcon}
+            />
 
-        <Pressable
-          style={styles.actionButton}
-          onPress={() => router.push("/goals")}
-        >
-          <Text style={styles.actionIcon}>🎯</Text>
-          <Text style={styles.actionText}>Metas</Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.actionButton}
-          onPress={() => router.push("/monthly-plan")}
-        >
-          <Text style={styles.actionIcon}>📊</Text>
-          <Text style={styles.actionText}>Planejamento</Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.actionButton}
-          onPress={() => router.push("/notifications")}
-        >
-          <Text style={styles.actionIcon}>🔔</Text>
-          <Text style={styles.actionText}>Alertas</Text>
-        </Pressable>
+            <Text style={styles.actionText}>{action.label}</Text>
+          </Pressable>
+        ))}
       </View>
     </>
   );
@@ -45,34 +74,42 @@ export function QuickActions() {
 
 const styles = StyleSheet.create({
   sectionTitle: {
-    color: "#fff",
+    color: colors.text,
     fontSize: 19,
     fontWeight: "900",
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
+
   actionsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 24,
+    gap: spacing.sm,
+    marginBottom: spacing.xl,
   },
+
   actionButton: {
     width: "48%",
-    backgroundColor: "#0f172a",
-    borderRadius: 22,
-    padding: 16,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.md,
     minHeight: 104,
     justifyContent: "space-between",
     borderWidth: 1,
-    borderColor: "#334155",
+    borderColor: colors.border,
   },
+
   actionIcon: {
-    fontSize: 24,
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
+
   actionText: {
-    color: "#e2e8f0",
+    color: colors.text,
     fontSize: 15,
     fontWeight: "800",
+  },
+
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 });

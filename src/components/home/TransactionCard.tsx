@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { colors, radius, spacing, typography } from "@/src/theme";
 import type { Transaction } from "@/src/types/transaction";
 import { formatCurrency } from "@/src/utils/currency";
 
@@ -63,19 +64,19 @@ export function TransactionCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#1e293b",
-    borderRadius: 16,
-    padding: 14,
+    backgroundColor: colors.card,
+    borderRadius: radius.lg,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: "#334155",
-    gap: 14,
+    borderColor: colors.border,
+    gap: spacing.md,
   },
 
   content: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 12,
+    gap: spacing.sm,
   },
 
   info: {
@@ -83,15 +84,15 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "#f8fafc",
-    fontSize: 16,
+    color: colors.text, 
+    fontSize: typography.body,
     fontWeight: "900",
   },
 
   category: {
-    color: "#94a3b8",
+    color: colors.textSecondary,
     fontSize: 13,
-    marginTop: 4,
+    marginTop: spacing.xs,
   },
 
   amount: {
@@ -101,41 +102,41 @@ const styles = StyleSheet.create({
   },
 
   income: {
-    color: "#22c55e",
+    color: colors.success,
   },
 
   expense: {
-    color: "#ef4444",
+    color: colors.danger,
   },
 
   actions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: 10,
+    gap: spacing.sm,
   },
 
   editButton: {
-    backgroundColor: "#1d4ed8",
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 9,
+    backgroundColor: colors.primary,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
 
   editButtonText: {
-    color: "#dbeafe",
+    color: colors.text,
     fontSize: 13,
     fontWeight: "800",
   },
 
   deleteButton: {
-    backgroundColor: "#7f1d1d",
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 9,
+    backgroundColor: colors.dangerDark,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
 
   deleteButtonText: {
-    color: "#fecaca",
+    color: colors.dangerLight,
     fontSize: 13,
     fontWeight: "800",
   },

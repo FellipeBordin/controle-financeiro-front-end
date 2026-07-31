@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { TransactionCard } from "@/src/components/home/TransactionCard";
+import { colors, radius, spacing, typography } from "@/src/theme";
 import type { Transaction } from "@/src/types/transaction";
 
 type LatestTransactionsProps = {
@@ -47,10 +48,9 @@ export function LatestTransactions({
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   section: {
-    gap: 12,
+    gap: spacing.sm,
   },
 
   header: {
@@ -60,42 +60,42 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: "#f8fafc",
+    color: colors.text,
     fontSize: 19,
     fontWeight: "900",
   },
 
   count: {
-    color: "#64748b",
+    color: colors.textSecondary,
     fontSize: 13,
     fontWeight: "700",
   },
 
   container: {
-    backgroundColor: "#0f172a",
-    borderRadius: 22,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
     borderWidth: 1,
-    borderColor: "#334155",
-    padding: 12,
-    gap: 10,
+    borderColor: colors.border,
+    padding: spacing.sm,
+    gap: spacing.sm,
   },
 
   emptyContainer: {
     alignItems: "center",
-    paddingVertical: 28,
-    paddingHorizontal: 16,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.md,
   },
 
   emptyTitle: {
-    color: "#f8fafc",
-    fontSize: 16,
+    color: colors.text,
+    fontSize: typography.body,
     fontWeight: "800",
   },
 
   emptyText: {
-    color: "#94a3b8",
+    color: colors.textSecondary,
     fontSize: 13,
     textAlign: "center",
-    marginTop: 6,
+    marginTop: spacing.xs,
   },
 });

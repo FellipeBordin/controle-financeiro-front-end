@@ -1,4 +1,7 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
+
+import { colors, radius, spacing, typography } from "@/src/theme";
 
 type InsightCardProps = {
   insight: string;
@@ -7,7 +10,16 @@ type InsightCardProps = {
 export function InsightCard({ insight }: InsightCardProps) {
   return (
     <View style={styles.aiCard}>
-      <Text style={styles.aiTitle}>💡 Insight do mês</Text>
+      <View style={styles.header}>
+        <MaterialCommunityIcons
+          name="lightbulb-on-outline"
+          size={24}
+          color={colors.primary}
+        />
+
+        <Text style={styles.aiTitle}>Insight do mês</Text>
+      </View>
+
       <Text style={styles.aiText}>{insight}</Text>
     </View>
   );
@@ -15,22 +27,30 @@ export function InsightCard({ insight }: InsightCardProps) {
 
 const styles = StyleSheet.create({
   aiCard: {
-    backgroundColor: "#0f172a",
-    borderRadius: 22,
-    padding: 18,
-    marginBottom: 22,
-    borderWidth: 1,
-    borderColor: "#1e40af",
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.lg,
+    marginBottom: spacing.xl,
+    borderLeftWidth: 5,
+    borderLeftColor: colors.primary,
   },
+
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+
   aiTitle: {
-    color: "#38bdf8",
+    color: colors.primary,
+    fontSize: typography.body,
     fontWeight: "900",
-    fontSize: 16,
-    marginBottom: 8,
   },
+
   aiText: {
-    color: "#e2e8f0",
+    color: colors.text,
     fontSize: 14,
-    lineHeight: 21,
+    lineHeight: 22,
   },
 });
