@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors, radius, spacing, typography } from "@/src/theme";
 import type { Transaction } from "@/src/types/transaction";
 import { formatCurrency } from "@/src/utils/currency";
+import { Card } from "../common/Card";
 
 type TransactionCardProps = {
   transaction: Transaction;
@@ -18,7 +19,7 @@ export function TransactionCard({
   const isIncome = transaction.type === "income";
 
   return (
-    <View style={styles.card}>
+    <Card style={styles.card}>
       <View style={styles.content}>
         <View style={styles.info}>
           <Text style={styles.title} numberOfLines={1}>
@@ -58,7 +59,7 @@ export function TransactionCard({
           <Text style={styles.deleteButtonText}>Excluir</Text>
         </Pressable>
       </View>
-    </View>
+    </Card>
   );
 }
 

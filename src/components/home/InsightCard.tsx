@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 
 import { colors, radius, spacing, typography } from "@/src/theme";
+import { Card } from "../common/Card";
 
 type InsightCardProps = {
   insight: string;
@@ -9,7 +10,7 @@ type InsightCardProps = {
 
 export function InsightCard({ insight }: InsightCardProps) {
   return (
-    <View style={styles.aiCard}>
+    <Card style={styles.aiCard}>
       <View style={styles.header}>
         <MaterialCommunityIcons
           name="lightbulb-on-outline"
@@ -21,7 +22,7 @@ export function InsightCard({ insight }: InsightCardProps) {
       </View>
 
       <Text style={styles.aiText}>{insight}</Text>
-    </View>
+    </Card>
   );
 }
 

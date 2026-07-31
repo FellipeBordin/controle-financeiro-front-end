@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { colors, radius, spacing, typography } from "@/src/theme";
 import type { TransactionSummary } from "@/src/types/transaction";
 import { formatCurrency } from "@/src/utils/currency";
+import { Card } from "../common/Card";
 
 type BalanceCardProps = {
   summary: TransactionSummary;
@@ -10,7 +11,7 @@ type BalanceCardProps = {
 
 export function BalanceCard({ summary }: BalanceCardProps) {
   return (
-    <View style={styles.balanceCard}>
+    <Card style={styles.balanceCard}>
       <Text style={styles.cardLabel}>Saldo atual</Text>
 
       <Text
@@ -39,7 +40,7 @@ export function BalanceCard({ summary }: BalanceCardProps) {
           </Text>
         </View>
       </View>
-    </View>
+    </Card>
   );
 }
 
