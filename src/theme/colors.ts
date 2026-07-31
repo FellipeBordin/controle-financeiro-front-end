@@ -19,5 +19,12 @@ export const colors = {
   dangerLight: "#fee2e2",
   dangerDark: "#7f1d1d",
 
-  whiteTransparent: "rgba(255,255,255,0.25)",
-};
+  warning: "#f59e0b",
+  warningLight: "#fef3c7",
+  warningDark: "#92400e",
+
+  info: "#38bdf8",
+
+  whiteTransparent: "rgba(255, 255, 255, 0.25)",
+  blackTransparent: "rgba(0, 0, 0, 0.25)",
+} as const;
