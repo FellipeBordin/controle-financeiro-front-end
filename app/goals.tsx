@@ -1,3 +1,6 @@
+import { getGoal, saveGoal } from "@/src/services/goals";
+import { getCurrentMonth } from "@/src/utils/date";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Alert,
@@ -9,10 +12,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { router, useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getGoal, saveGoal } from "@/src/services/goals";
-import { getCurrentMonth } from "@/src/utils/date";
 
 type GoalSummary = {
   month: string;
@@ -38,28 +38,36 @@ export default function GoalsScreen() {
 
   const month = getCurrentMonth();
 
-  async function loadGoal() {
-    try {
-      setLoading(true);
+const loadGoal = useCallback(async () => {
+  try {
+    setLoading(true);
 
-      const data = await getGoal(month);
+    const data = await getGoal(month);
 
-      setSummary(data.summary);
+    setSummary(data.summary);
 
-      if (data.goal) {
-        setTargetAmount(String(data.goal.targetAmount));
-      }
-    } catch {
-      Alert.alert("Erro", "Não foi possível carregar sua meta.");
-    } finally {
-      setLoading(false);
+    if (data.goal) {
+      setTargetAmount(String(data.goal.targetAmount));
+      return;
     }
+
+    setTargetAmount("");
+  } catch (error) {
+    console.error("Erro ao carregar meta:", error);
+
+    Alert.alert(
+      "Erro",
+      "Não foi possível carregar sua meta.",
+    );
+  } finally {
+    setLoading(false);
   }
+}, [month]);
 
   useFocusEffect(
     useCallback(() => {
-      loadGoal();
-    }, []),
+      void loadGoal();
+    }, [loadGoal]),
   );
 
   async function handleSaveGoal() {

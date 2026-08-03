@@ -1,3 +1,14 @@
+import {
+  deleteMonthlyPlan,
+  getMonthlyPlan,
+  saveMonthlyPlan,
+} from "@/src/services/monthly-plan";
+import type {
+  BudgetCategory,
+  MonthlyPlanResponse,
+} from "@/src/types/monthly-plan";
+import { getCurrentMonth } from "@/src/utils/date";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Alert,
@@ -9,18 +20,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { router, useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { getCurrentMonth } from "@/src/utils/date";
-import {
-  deleteMonthlyPlan,
-  getMonthlyPlan,
-  saveMonthlyPlan,
-} from "@/src/services/monthly-plan";
-import type {
-  BudgetCategory,
-  MonthlyPlanResponse,
-} from "@/src/types/monthly-plan";
 
 const defaultCategories = [
   "Moradia",
@@ -59,35 +59,50 @@ export default function MonthlyPlanScreen() {
   );
   const [data, setData] = useState<MonthlyPlanResponse | null>(null);
   const [loading, setLoading] = useState(false);
+const loadPlan = useCallback(async () => {
+  try {
+    setLoading(true);
 
-  async function loadPlan() {
-    try {
-      setLoading(true);
+    const response = await getMonthlyPlan(month);
 
-      const response = await getMonthlyPlan(month);
-      setData(response);
+    setData(response);
 
-      if (response.plan) {
-        setExpectedIncome(String(response.plan.expectedIncome));
+    if (response.plan) {
+      setExpectedIncome(String(response.plan.expectedIncome));
 
-        setCategories(
-          response.plan.budgetCategories.map((category) => ({
-            name: category.name,
-            plannedAmount: String(category.plannedAmount),
-          })),
-        );
-      }
-    } catch {
-      Alert.alert("Erro", "Não foi possível carregar o planejamento.");
-    } finally {
-      setLoading(false);
+      setCategories(
+        response.plan.budgetCategories.map((category) => ({
+          name: category.name,
+          plannedAmount: String(category.plannedAmount),
+        })),
+      );
+
+      return;
     }
+
+    setExpectedIncome("");
+    setCategories(
+      defaultCategories.map((name) => ({
+        name,
+        plannedAmount: "",
+      })),
+    );
+  } catch (error) {
+    console.error("Erro ao carregar planejamento:", error);
+
+    Alert.alert(
+      "Erro",
+      "Não foi possível carregar o planejamento.",
+    );
+  } finally {
+    setLoading(false);
   }
+}, [month]);
 
   useFocusEffect(
     useCallback(() => {
-      loadPlan();
-    }, []),
+      void loadPlan();
+    }, [loadPlan]),
   );
 
   function updateCategoryAmount(index: number, value: string) {

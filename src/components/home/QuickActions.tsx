@@ -1,8 +1,9 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 
 import { colors, radius, spacing } from "@/src/theme";
+import { Section } from "../common/Section";
 
 type ActionItem = {
   label: string;
@@ -45,10 +46,10 @@ const actions: ActionItem[] = [
 export function QuickActions() {
   return (
     <>
-      <Text style={styles.sectionTitle}>Ações rápidas</Text>
-
-      <View style={styles.actionsGrid}>
-        {actions.map((action) => (
+      <Section title="Ações rápidas"
+      contentStyle={styles.actionsGrid}
+      > 
+       {actions.map((action) => (
           <Pressable
             key={action.route}
             style={({ pressed }) => [
@@ -67,7 +68,7 @@ export function QuickActions() {
             <Text style={styles.actionText}>{action.label}</Text>
           </Pressable>
         ))}
-      </View>
+      </Section>
     </>
   );
 }
@@ -84,8 +85,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: spacing.sm,
-    marginBottom: spacing.xl,
-  },
+    },
 
   actionButton: {
     width: "48%",
