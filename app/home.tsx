@@ -3,20 +3,18 @@ import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import {
   Pressable,
-  RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ScreenContainer } from "@/src/components/common/ScreenContainer";
 import { BalanceCard } from "@/src/components/home/BalanceCard";
 import { InsightCard } from "@/src/components/home/InsightCard";
 import { LatestTransactions } from "@/src/components/home/LatestTransactions";
 import { QuickActions } from "@/src/components/home/QuickActions";
 import { useHome } from "@/src/hooks/useHome";
-import { colors, radius, spacing, typography } from "@/src/theme";
+import { colors, iconSizes, radius, spacing } from "@/src/theme";
 
 export default function HomeScreen() {
   const {
@@ -32,80 +30,59 @@ export default function HomeScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      loadData();
+      void loadData();
     }, [loadData]),
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={loadData}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-      >
-        <View style={styles.header}>
-          <View style={styles.headerText}>
-            <Text style={styles.title}>Bem-vindo</Text>
+    <ScreenContainer
+      refreshing={loading}
+      onRefresh={loadData}
+    >
+      <View style={styles.header}>
+        <View style={styles.headerText}>
+          <Text style={styles.title}>Bem-vindo</Text>
 
-            <Text style={styles.subtitle}>
-              Seu controle financeiro
-            </Text>
-          </View>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.logoutButton,
-              pressed && styles.logoutButtonPressed,
-            ]}
-            onPress={handleLogout}
-            accessibilityRole="button"
-            accessibilityLabel="Sair da conta"
-          >
-            <MaterialCommunityIcons
-              name="logout"
-              size={20}
-              color={colors.danger}
-            />
-
-            <Text style={styles.logoutText}>Sair</Text>
-          </Pressable>
+          <Text style={styles.subtitle}>
+            Seu controle financeiro
+          </Text>
         </View>
 
-        <BalanceCard summary={summary} />
+        <Pressable
+          style={({ pressed }) => [
+            styles.logoutButton,
+            pressed && styles.logoutButtonPressed,
+          ]}
+          onPress={handleLogout}
+          accessibilityRole="button"
+          accessibilityLabel="Sair da conta"
+        >
+          <MaterialCommunityIcons
+            name="logout"
+            size={iconSizes.sm}
+            color={colors.danger}
+          />
 
-        {insight ? <InsightCard insight={insight} /> : null}
+          <Text style={styles.logoutText}>Sair</Text>
+        </Pressable>
+      </View>
 
-        <QuickActions />
+      <BalanceCard summary={summary} />
 
-        <LatestTransactions
-          transactions={latestTransactions}
-          onDelete={handleDeleteTransaction}
-          onEdit={handleEditTransaction}
-        />
-      </ScrollView>
-    </SafeAreaView>
+      {insight ? <InsightCard insight={insight} /> : null}
+
+      <QuickActions />
+
+      <LatestTransactions
+        transactions={latestTransactions}
+        onDelete={handleDeleteTransaction}
+        onEdit={handleEditTransaction}
+      />
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-
-  content: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xxl,
-  },
-
   header: {
     marginBottom: spacing.xl,
     flexDirection: "row",
@@ -126,7 +103,7 @@ const styles = StyleSheet.create({
 
   subtitle: {
     color: colors.textSecondary,
-    fontSize: typography.body,
+    fontSize: 16,
     marginTop: spacing.xs,
   },
 
@@ -134,7 +111,7 @@ const styles = StyleSheet.create({
     minHeight: 44,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: radius.card,
+    borderRadius: radius.full,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,

@@ -1,3 +1,4 @@
+import { ScreenContainer } from "@/src/components/common/ScreenContainer";
 import { getGoal, saveGoal } from "@/src/services/goals";
 import { getCurrentMonth } from "@/src/utils/date";
 import { router, useFocusEffect } from "expo-router";
@@ -5,14 +6,11 @@ import { useCallback, useState } from "react";
 import {
   Alert,
   Pressable,
-  RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 type GoalSummary = {
   month: string;
@@ -97,13 +95,10 @@ const loadGoal = useCallback(async () => {
       : 0;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={loadGoal} />
-        }
-      >
+   <ScreenContainer
+  refreshing={loading}
+  onRefresh={loadGoal}
+>
         <Pressable onPress={() => router.replace("/home")}>
           <Text style={styles.back}>← Voltar</Text>
         </Pressable>
@@ -178,18 +173,12 @@ const loadGoal = useCallback(async () => {
             )}
           </View>
         )}
-      </ScrollView>
-    </SafeAreaView>
+      </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0f172a",
-    padding: 20,
-  },
-  back: {
+ back: {
     color: "#38bdf8",
     fontWeight: "700",
     marginTop: 16,
