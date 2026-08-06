@@ -1,3 +1,4 @@
+import { PageHeader } from "@/src/components/common/PageHeader";
 import { ScreenContainer } from "@/src/components/common/ScreenContainer";
 import { getGoal, saveGoal } from "@/src/services/goals";
 import { getCurrentMonth } from "@/src/utils/date";
@@ -36,31 +37,31 @@ export default function GoalsScreen() {
 
   const month = getCurrentMonth();
 
-const loadGoal = useCallback(async () => {
-  try {
-    setLoading(true);
+  const loadGoal = useCallback(async () => {
+    try {
+      setLoading(true);
 
-    const data = await getGoal(month);
+      const data = await getGoal(month);
 
-    setSummary(data.summary);
+      setSummary(data.summary);
 
-    if (data.goal) {
-      setTargetAmount(String(data.goal.targetAmount));
-      return;
+      if (data.goal) {
+        setTargetAmount(String(data.goal.targetAmount));
+        return;
+      }
+
+      setTargetAmount("");
+    } catch (error) {
+      console.error("Erro ao carregar meta:", error);
+
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar sua meta.",
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setTargetAmount("");
-  } catch (error) {
-    console.error("Erro ao carregar meta:", error);
-
-    Alert.alert(
-      "Erro",
-      "Não foi possível carregar sua meta.",
-    );
-  } finally {
-    setLoading(false);
-  }
-}, [month]);
+  }, [month]);
 
   useFocusEffect(
     useCallback(() => {
@@ -95,105 +96,88 @@ const loadGoal = useCallback(async () => {
       : 0;
 
   return (
-   <ScreenContainer
-  refreshing={loading}
-  onRefresh={loadGoal}
->
-        <Pressable onPress={() => router.replace("/home")}>
-          <Text style={styles.back}>← Voltar</Text>
+    <ScreenContainer
+      refreshing={loading}
+      onRefresh={loadGoal}
+    >
+      <PageHeader
+        title="Meta mensal"
+        subtitle={`Mês atual: ${month}`}
+        onBack={() => router.replace("/home")}
+      />
+
+      <View style={styles.card}>
+        <Text style={styles.label}>Quanto você quer guardar este mês?</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Ex: 500"
+          placeholderTextColor="#94a3b8"
+          keyboardType="numeric"
+          value={targetAmount}
+          onChangeText={setTargetAmount}
+        />
+
+        <Pressable style={styles.button} onPress={handleSaveGoal}>
+          <Text style={styles.buttonText}>Salvar meta</Text>
         </Pressable>
+      </View>
 
-        <Text style={styles.title}>Meta mensal</Text>
-        <Text style={styles.subtitle}>Mês atual: {month}</Text>
-
+      {summary && (
         <View style={styles.card}>
-          <Text style={styles.label}>Quanto você quer guardar este mês?</Text>
+          <Text style={styles.cardTitle}>Resumo da meta</Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Ex: 500"
-            placeholderTextColor="#94a3b8"
-            keyboardType="numeric"
-            value={targetAmount}
-            onChangeText={setTargetAmount}
-          />
-
-          <Pressable style={styles.button} onPress={handleSaveGoal}>
-            <Text style={styles.buttonText}>Salvar meta</Text>
-          </Pressable>
-        </View>
-
-        {summary && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Resumo da meta</Text>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Receitas</Text>
-              <Text style={styles.incomeText}>
-                {formatCurrency(summary.totalIncome)}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Despesas</Text>
-              <Text style={styles.expenseText}>
-                {formatCurrency(summary.totalExpense)}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Saldo</Text>
-              <Text style={styles.balanceText}>
-                {formatCurrency(summary.balance)}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Meta</Text>
-              <Text style={styles.balanceText}>
-                {formatCurrency(summary.targetAmount)}
-              </Text>
-            </View>
-
-            <View style={styles.progressContainer}>
-              <View style={[styles.progressBar, { width: `${progress}%` }]} />
-            </View>
-
-            <Text style={styles.progressText}>
-              {progress.toFixed(0)}% da meta atingida
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Receitas</Text>
+            <Text style={styles.incomeText}>
+              {formatCurrency(summary.totalIncome)}
             </Text>
-
-            {summary.goalReached ? (
-              <Text style={styles.successText}>Parabéns! Meta atingida.</Text>
-            ) : (
-              <Text style={styles.warningText}>
-                Faltam {formatCurrency(summary.remainingToGoal)} para atingir a
-                meta.
-              </Text>
-            )}
           </View>
-        )}
-      </ScreenContainer>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Despesas</Text>
+            <Text style={styles.expenseText}>
+              {formatCurrency(summary.totalExpense)}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Saldo</Text>
+            <Text style={styles.balanceText}>
+              {formatCurrency(summary.balance)}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Meta</Text>
+            <Text style={styles.balanceText}>
+              {formatCurrency(summary.targetAmount)}
+            </Text>
+          </View>
+
+          <View style={styles.progressContainer}>
+            <View style={[styles.progressBar, { width: `${progress}%` }]} />
+          </View>
+
+          <Text style={styles.progressText}>
+            {progress.toFixed(0)}% da meta atingida
+          </Text>
+
+          {summary.goalReached ? (
+            <Text style={styles.successText}>Parabéns! Meta atingida.</Text>
+          ) : (
+            <Text style={styles.warningText}>
+              Faltam {formatCurrency(summary.remainingToGoal)} para atingir a
+              meta.
+            </Text>
+          )}
+        </View>
+      )}
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
- back: {
-    color: "#38bdf8",
-    fontWeight: "700",
-    marginTop: 16,
-    marginBottom: 20,
-  },
-  title: {
-    color: "#fff",
-    fontSize: 28,
-    fontWeight: "800",
-  },
-  subtitle: {
-    color: "#94a3b8",
-    marginTop: 6,
-    marginBottom: 20,
-  },
   card: {
     backgroundColor: "#1e293b",
     borderRadius: 18,

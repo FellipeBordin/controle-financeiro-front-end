@@ -1,26 +1,20 @@
+import { PageHeader } from "@/src/components/common/PageHeader";
+import { ScreenContainer } from "@/src/components/common/ScreenContainer";
 import {
-  deleteMonthlyPlan,
-  getMonthlyPlan,
-  saveMonthlyPlan,
+  deleteMonthlyPlan, getMonthlyPlan, saveMonthlyPlan,
 } from "@/src/services/monthly-plan";
-import type {
-  BudgetCategory,
-  MonthlyPlanResponse,
-} from "@/src/types/monthly-plan";
+import type { BudgetCategory, MonthlyPlanResponse, } from "@/src/types/monthly-plan";
 import { getCurrentMonth } from "@/src/utils/date";
 import { router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   Alert,
   Pressable,
-  RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const defaultCategories = [
   "Moradia",
@@ -59,45 +53,45 @@ export default function MonthlyPlanScreen() {
   );
   const [data, setData] = useState<MonthlyPlanResponse | null>(null);
   const [loading, setLoading] = useState(false);
-const loadPlan = useCallback(async () => {
-  try {
-    setLoading(true);
+  const loadPlan = useCallback(async () => {
+    try {
+      setLoading(true);
 
-    const response = await getMonthlyPlan(month);
+      const response = await getMonthlyPlan(month);
 
-    setData(response);
+      setData(response);
 
-    if (response.plan) {
-      setExpectedIncome(String(response.plan.expectedIncome));
+      if (response.plan) {
+        setExpectedIncome(String(response.plan.expectedIncome));
 
+        setCategories(
+          response.plan.budgetCategories.map((category) => ({
+            name: category.name,
+            plannedAmount: String(category.plannedAmount),
+          })),
+        );
+
+        return;
+      }
+
+      setExpectedIncome("");
       setCategories(
-        response.plan.budgetCategories.map((category) => ({
-          name: category.name,
-          plannedAmount: String(category.plannedAmount),
+        defaultCategories.map((name) => ({
+          name,
+          plannedAmount: "",
         })),
       );
+    } catch (error) {
+      console.error("Erro ao carregar planejamento:", error);
 
-      return;
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar o planejamento.",
+      );
+    } finally {
+      setLoading(false);
     }
-
-    setExpectedIncome("");
-    setCategories(
-      defaultCategories.map((name) => ({
-        name,
-        plannedAmount: "",
-      })),
-    );
-  } catch (error) {
-    console.error("Erro ao carregar planejamento:", error);
-
-    Alert.alert(
-      "Erro",
-      "Não foi possível carregar o planejamento.",
-    );
-  } finally {
-    setLoading(false);
-  }
-}, [month]);
+  }, [month]);
 
   useFocusEffect(
     useCallback(() => {
@@ -186,182 +180,156 @@ const loadPlan = useCallback(async () => {
   const plannedBalance = expectedIncomeNumber - plannedTotal;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={loading} onRefresh={loadPlan} />
-        }
-      >
-        <Pressable onPress={() => router.replace("/home")}>
-          <Text style={styles.back}>← Voltar</Text>
-        </Pressable>
+    <ScreenContainer
+      refreshing={loading}
+      onRefresh={loadPlan}
+    >
+      <PageHeader
+        title="Planejamento mensal"
+        subtitle={`Mês atual: ${month}`}
+        onBack={() => router.replace("/home")}
+      />
 
-        <Text style={styles.title}>Planejamento mensal</Text>
-        <Text style={styles.subtitle}>Mês atual: {month}</Text>
+      <View style={styles.card}>
+        <Text style={styles.label}>Renda prevista no mês</Text>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>Renda prevista no mês</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Ex: 3000"
+          placeholderTextColor="#94a3b8"
+          keyboardType="numeric"
+          value={expectedIncome}
+          onChangeText={setExpectedIncome}
+        />
 
-          <TextInput
-            style={styles.input}
-            placeholder="Ex: 3000"
-            placeholderTextColor="#94a3b8"
-            keyboardType="numeric"
-            value={expectedIncome}
-            onChangeText={setExpectedIncome}
-          />
-
-          <View style={styles.previewBox}>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Total planejado</Text>
-              <Text style={styles.expenseText}>
-                {formatCurrency(plannedTotal)}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Saldo planejado</Text>
-              <Text
-                style={
-                  plannedBalance >= 0 ? styles.incomeText : styles.expenseText
-                }
-              >
-                {formatCurrency(plannedBalance)}
-              </Text>
-            </View>
-          </View>
-        </View>
-
-        <Text style={styles.sectionTitle}>Categorias planejadas</Text>
-
-        {categories.map((category, index) => (
-          <View key={category.name} style={styles.categoryRow}>
-            <Text style={styles.categoryName}>{category.name}</Text>
-
-            <TextInput
-              style={styles.categoryInput}
-              placeholder="0"
-              placeholderTextColor="#64748b"
-              keyboardType="numeric"
-              value={category.plannedAmount}
-              onChangeText={(value) => updateCategoryAmount(index, value)}
-            />
-          </View>
-        ))}
-
-        <Pressable style={styles.button} onPress={handleSave}>
-          <Text style={styles.buttonText}>Salvar planejamento</Text>
-        </Pressable>
-
-        {data?.plan && (
-          <Pressable
-            style={({ pressed }) => [
-              styles.deletePlanButton,
-              pressed && { opacity: 0.6 },
-            ]}
-            onPress={() => {
-              console.log("PRESSIONOU PRESSABLE");
-              handleDeletePlan();
-            }}
-          >
-            <Text style={styles.deletePlanText}>Excluir planejamento</Text>
-          </Pressable>
-        )}
-
-        {data?.plan && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Planejado x Realizado</Text>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Receita prevista</Text>
-              <Text style={styles.balanceText}>
-                {formatCurrency(data.summary.expectedIncome)}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Receita real</Text>
-              <Text style={styles.incomeText}>
-                {formatCurrency(data.summary.realIncome)}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Despesa planejada</Text>
-              <Text style={styles.balanceText}>
-                {formatCurrency(data.summary.plannedExpense)}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Despesa real</Text>
-              <Text style={styles.expenseText}>
-                {formatCurrency(data.summary.realExpense)}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Saldo real</Text>
-              <Text
-                style={
-                  data.summary.realBalance >= 0
-                    ? styles.incomeText
-                    : styles.expenseText
-                }
-              >
-                {formatCurrency(data.summary.realBalance)}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {data?.plan?.budgetCategories?.map((category: BudgetCategory) => (
-          <View key={category.id} style={styles.resultCategoryCard}>
-            <View>
-              <Text style={styles.resultCategoryName}>{category.name}</Text>
-              <Text style={styles.resultCategorySub}>
-                Planejado: {formatCurrency(category.plannedAmount)}
-              </Text>
-              <Text style={styles.resultCategorySub}>
-                Realizado: {formatCurrency(category.realAmount)}
-              </Text>
-            </View>
-
-            <Text
-              style={category.exceeded ? styles.expenseText : styles.incomeText}
-            >
-              {category.exceeded ? "Estourou" : "Ok"}
+        <View style={styles.previewBox}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Total planejado</Text>
+            <Text style={styles.expenseText}>
+              {formatCurrency(plannedTotal)}
             </Text>
           </View>
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Saldo planejado</Text>
+            <Text
+              style={
+                plannedBalance >= 0 ? styles.incomeText : styles.expenseText
+              }
+            >
+              {formatCurrency(plannedBalance)}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      <Text style={styles.sectionTitle}>Categorias planejadas</Text>
+
+      {categories.map((category, index) => (
+        <View key={category.name} style={styles.categoryRow}>
+          <Text style={styles.categoryName}>{category.name}</Text>
+
+          <TextInput
+            style={styles.categoryInput}
+            placeholder="0"
+            placeholderTextColor="#64748b"
+            keyboardType="numeric"
+            value={category.plannedAmount}
+            onChangeText={(value) => updateCategoryAmount(index, value)}
+          />
+        </View>
+      ))}
+
+      <Pressable style={styles.button} onPress={handleSave}>
+        <Text style={styles.buttonText}>Salvar planejamento</Text>
+      </Pressable>
+
+      {data?.plan && (
+        <Pressable
+          style={({ pressed }) => [
+            styles.deletePlanButton,
+            pressed && { opacity: 0.6 },
+          ]}
+          onPress={() => {
+            console.log("PRESSIONOU PRESSABLE");
+            handleDeletePlan();
+          }}
+        >
+          <Text style={styles.deletePlanText}>Excluir planejamento</Text>
+        </Pressable>
+      )}
+
+      {data?.plan && (
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Planejado x Realizado</Text>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Receita prevista</Text>
+            <Text style={styles.balanceText}>
+              {formatCurrency(data.summary.expectedIncome)}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Receita real</Text>
+            <Text style={styles.incomeText}>
+              {formatCurrency(data.summary.realIncome)}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Despesa planejada</Text>
+            <Text style={styles.balanceText}>
+              {formatCurrency(data.summary.plannedExpense)}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Despesa real</Text>
+            <Text style={styles.expenseText}>
+              {formatCurrency(data.summary.realExpense)}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Saldo real</Text>
+            <Text
+              style={
+                data.summary.realBalance >= 0
+                  ? styles.incomeText
+                  : styles.expenseText
+              }
+            >
+              {formatCurrency(data.summary.realBalance)}
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {data?.plan?.budgetCategories?.map((category: BudgetCategory) => (
+        <View key={category.id} style={styles.resultCategoryCard}>
+          <View>
+            <Text style={styles.resultCategoryName}>{category.name}</Text>
+            <Text style={styles.resultCategorySub}>
+              Planejado: {formatCurrency(category.plannedAmount)}
+            </Text>
+            <Text style={styles.resultCategorySub}>
+              Realizado: {formatCurrency(category.realAmount)}
+            </Text>
+          </View>
+
+          <Text
+            style={category.exceeded ? styles.expenseText : styles.incomeText}
+          >
+            {category.exceeded ? "Estourou" : "Ok"}
+          </Text>
+        </View>
+      ))}
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0f172a",
-    padding: 20,
-  },
-  back: {
-    color: "#38bdf8",
-    fontWeight: "700",
-    marginTop: 16,
-    marginBottom: 20,
-  },
-  title: {
-    color: "#fff",
-    fontSize: 28,
-    fontWeight: "800",
-  },
-  subtitle: {
-    color: "#94a3b8",
-    marginTop: 6,
-    marginBottom: 20,
-  },
   deletePlanButton: {
     backgroundColor: "#7f1d1d",
     padding: 14,
