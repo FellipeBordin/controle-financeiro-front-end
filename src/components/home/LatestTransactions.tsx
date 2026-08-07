@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import { TransactionCard } from "@/src/components/home/TransactionCard";
-import { colors, radius, spacing, typography } from "@/src/theme";
+import { colors, radius, spacing } from "@/src/theme";
 import type { Transaction } from "@/src/types/transaction";
+import { EmptyState } from "../common/EmptyState";
 
 type LatestTransactionsProps = {
   transactions: Transaction[];
@@ -27,13 +28,11 @@ export function LatestTransactions({
 
       <View style={styles.container}>
         {transactions.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyTitle}>Nenhum lançamento</Text>
-
-            <Text style={styles.emptyText}>
-              Cadastre uma receita ou despesa para começar.
-            </Text>
-          </View>
+          <EmptyState
+            title="Nenhum lançamento"
+            message="Cadastre uma receita ou despesa para começar."
+            icon="cash-remove"
+          />
         ) : (
           transactions.map((transaction) => (
             <TransactionCard
@@ -78,24 +77,5 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     padding: spacing.sm,
     gap: spacing.sm,
-  },
-
-  emptyContainer: {
-    alignItems: "center",
-    paddingVertical: spacing.xl,
-    paddingHorizontal: spacing.md,
-  },
-
-  emptyTitle: {
-    color: colors.text,
-    fontSize: typography.body,
-    fontWeight: "800",
-  },
-
-  emptyText: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    textAlign: "center",
-    marginTop: spacing.xs,
   },
 });

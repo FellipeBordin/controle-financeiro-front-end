@@ -7,11 +7,12 @@ import {
   View,
 } from "react-native";
 
+import { FormField } from "@/src/components/common/FormField";
 import { TransactionCategorySelector } from "@/src/components/Transactions/TransactionCategorySelector";
 import { TransactionTypeSelector } from "@/src/components/Transactions/TransactionTypeSelector";
 import { colors, radius, spacing, typography } from "@/src/theme";
 import type { TransactionType } from "@/src/types/transaction";
-import { TransactionFormErrors } from "@/src/types/transactionForm";
+import type { TransactionFormErrors } from "@/src/types/transactionForm";
 
 type TransactionFormProps = {
   title: string;
@@ -65,11 +66,14 @@ export function TransactionForm({
   return (
     <View style={styles.form}>
       {useTypeSelector ? (
-        <TransactionTypeSelector value={type} onChange={onChangeType} />
+        <FormField label="Tipo" required>
+          <TransactionTypeSelector
+            value={type}
+            onChange={onChangeType}
+          />
+        </FormField>
       ) : (
-        <View style={styles.field}>
-          <Text style={styles.label}>Tipo</Text>
-
+        <FormField label="Tipo" required>
           <View style={styles.typeContainer}>
             <Pressable
               style={[
@@ -107,91 +111,97 @@ export function TransactionForm({
               </Text>
             </Pressable>
           </View>
-        </View>
+        </FormField>
       )}
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Título</Text>
-
+      <FormField
+        label="Título"
+        required
+        error={errors.title}
+      >
         <TextInput
-          style={[styles.input, errors.title && styles.inputError]}
+          style={[
+            styles.input,
+            errors.title && styles.inputError,
+          ]}
           placeholder="Ex.: Salário, mercado, combustível"
-          placeholderTextColor="#64748b"
+          placeholderTextColor={colors.textSecondary}
           value={title}
           onChangeText={onChangeTitle}
           editable={!loading}
           autoCapitalize="sentences"
         />
+      </FormField>
 
-        {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
-      </View>
-
-      <View style={styles.field}>
-        <Text style={styles.label}>Valor</Text>
-
+      <FormField
+        label="Valor"
+        required
+        error={errors.amount}
+      >
         <TextInput
-          style={[styles.input, errors.amount && styles.inputError]}
+          style={[
+            styles.input,
+            errors.amount && styles.inputError,
+          ]}
           placeholder="R$ 0,00"
-          placeholderTextColor="#64748b"
+          placeholderTextColor={colors.textSecondary}
           value={amount}
           onChangeText={onChangeAmount}
           keyboardType="numeric"
           editable={!loading}
         />
-
-        {errors.amount && <Text style={styles.errorText}>{errors.amount}</Text>}
-      </View>
+      </FormField>
 
       {useCategorySelector ? (
-        <View style={styles.field}>
-          <Text style={styles.label}>Categoria</Text>
-
+        <FormField
+          label="Categoria"
+          required
+          error={errors.category}
+        >
           <TransactionCategorySelector
             categories={categories}
             value={category}
             onChange={onChangeCategory}
           />
-
-          {errors.category && (
-            <Text style={styles.errorText}>{errors.category}</Text>
-          )}
-        </View>
+        </FormField>
       ) : (
-        <View style={styles.field}>
-          <Text style={styles.label}>Categoria</Text>
-
+        <FormField
+          label="Categoria"
+          required
+          error={errors.category}
+        >
           <TextInput
-            style={[styles.input, errors.category && styles.inputError]}
+            style={[
+              styles.input,
+              errors.category && styles.inputError,
+            ]}
             placeholder="Ex.: Alimentação, moradia, salário"
-            placeholderTextColor="#64748b"
+            placeholderTextColor={colors.textSecondary}
             value={category}
             onChangeText={onChangeCategory}
             editable={!loading}
             autoCapitalize="sentences"
           />
-
-          {errors.category && (
-            <Text style={styles.errorText}>{errors.category}</Text>
-          )}
-        </View>
+        </FormField>
       )}
 
-      {showNotes && onChangeNotes && (
-        <View style={styles.field}>
-          <Text style={styles.label}>Observação</Text>
-
+      {showNotes && onChangeNotes ? (
+        <FormField
+          label="Observação"
+          helperText="Campo opcional"
+        >
           <TextInput
             style={[styles.input, styles.textArea]}
-            placeholder="Observação opcional"
-            placeholderTextColor="#64748b"
+            placeholder="Digite uma observação"
+            placeholderTextColor={colors.textSecondary}
             value={notes}
             onChangeText={onChangeNotes}
             editable={!loading}
             multiline
             textAlignVertical="top"
           />
-        </View>
-      )}
+        </FormField>
+      ) : null}
 
       <Pressable
         style={({ pressed }) => [
@@ -204,12 +214,16 @@ export function TransactionForm({
       >
         {loading ? (
           <View style={styles.loadingContent}>
-            <ActivityIndicator color="#ffffff" />
+            <ActivityIndicator color={colors.text} />
 
-            <Text style={styles.saveButtonText}>{loadingLabel}</Text>
+            <Text style={styles.saveButtonText}>
+              {loadingLabel}
+            </Text>
           </View>
         ) : (
-          <Text style={styles.saveButtonText}>{submitLabel}</Text>
+          <Text style={styles.saveButtonText}>
+            {submitLabel}
+          </Text>
         )}
       </Pressable>
 
@@ -222,7 +236,9 @@ export function TransactionForm({
         disabled={loading}
         onPress={onCancel}
       >
-        <Text style={styles.cancelButtonText}>Cancelar</Text>
+        <Text style={styles.cancelButtonText}>
+          Cancelar
+        </Text>
       </Pressable>
     </View>
   );
@@ -236,16 +252,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.xl,
     padding: spacing.lg,
     gap: spacing.lg,
-  },
-
-  field: {
-    gap: spacing.sm,
-  },
-
-  label: {
-    color: colors.text,
-    fontSize: typography.caption,
-    fontWeight: "800",
   },
 
   input: {
@@ -268,11 +274,6 @@ const styles = StyleSheet.create({
     borderColor: colors.danger,
   },
 
-  errorText: {
-    color: colors.danger,
-    fontSize: 12,
-  },
-
   typeContainer: {
     flexDirection: "row",
     gap: spacing.sm,
@@ -290,12 +291,12 @@ const styles = StyleSheet.create({
   },
 
   incomeButtonSelected: {
-    backgroundColor: "#166534",
+    backgroundColor: colors.successDark,
     borderColor: colors.success,
   },
 
   expenseButtonSelected: {
-    backgroundColor: "#7f1d1d",
+    backgroundColor: colors.dangerDark,
     borderColor: colors.danger,
   },
 

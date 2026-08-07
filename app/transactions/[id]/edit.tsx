@@ -1,11 +1,10 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { ActivityIndicator } from "react-native";
 
+import { LoadingState } from "@/src/components/common/LoadingState";
 import { PageHeader } from "@/src/components/common/PageHeader";
 import { ScreenContainer } from "@/src/components/common/ScreenContainer";
 import { TransactionForm } from "@/src/components/Transactions/TransactionForm";
 import { useEditTransaction } from "@/src/hooks/useEditTransaction";
-import { colors } from "@/src/theme";
 
 export default function EditTransactionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -26,21 +25,14 @@ export default function EditTransactionScreen() {
   } = useEditTransaction({ id });
 
   if (loading) {
-    return (
-      <ScreenContainer
-        contentContainerStyle={{
-          flexGrow: 1,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <ActivityIndicator
-          size="large"
-          color={colors.primary}
-        />
-      </ScreenContainer>
-    );
-  }
+  return (
+    <ScreenContainer
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
+      <LoadingState message="Carregando lançamento..." />
+    </ScreenContainer>
+  );
+}
 
   return (
     <ScreenContainer>
@@ -70,4 +62,4 @@ export default function EditTransactionScreen() {
       />
     </ScreenContainer>
   );
-}
+} 
