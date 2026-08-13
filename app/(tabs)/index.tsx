@@ -1,28 +1,37 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useFocusEffect } from "expo-router";
 import { useCallback } from "react";
 import {
-  ActivityIndicator,
   Pressable,
-  SafeAreaView,
-  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import { useFocusEffect } from "expo-router";
 
+import { LoadingState } from "@/src/components/common/LoadingState";
+import { ScreenContainer } from "@/src/components/common/ScreenContainer";
 import { BalanceCard } from "@/src/components/home/BalanceCard";
 import { InsightCard } from "@/src/components/home/InsightCard";
 import { LatestTransactions } from "@/src/components/home/LatestTransactions";
 import { QuickActions } from "@/src/components/home/QuickActions";
 import { useHome } from "@/src/hooks/useHome";
+import {
+  colors,
+  iconSizes,
+  radius,
+  spacing,
+  typography,
+} from "@/src/theme";
 
 export default function HomeScreen() {
   const {
     summary,
     insight,
     loading,
+    refreshing,
     latestTransactions,
     loadData,
+    refreshData,
     handleLogout,
     handleDeleteTransaction,
     handleEditTransaction,
@@ -35,107 +44,116 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.welcomeText}>Olá</Text>
+    <ScreenContainer
+      refreshing={refreshing}
+      onRefresh={refreshData}
+      contentContainerStyle={styles.content}
+    >
+      <View style={styles.header}>
+        <View style={styles.headerText}>
+          <Text style={styles.welcomeText}>Olá</Text>
 
-            <Text style={styles.title}>Controle financeiro</Text>
-          </View>
-
-          <Pressable
-            style={styles.logoutButton}
-            onPress={() => {
-              void handleLogout();
-            }}
-          >
-            <Text style={styles.logoutButtonText}>Sair</Text>
-          </Pressable>
+          <Text style={styles.title}>
+            Controle financeiro
+          </Text>
         </View>
 
-        {loading ? (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" />
-            <Text style={styles.loadingText}>Carregando informações...</Text>
-          </View>
-        ) : (
-          <>
-            <BalanceCard summary={summary} />
+        <Pressable
+          style={({ pressed }) => [
+            styles.logoutButton,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={() => {
+            void handleLogout();
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Sair da conta"
+        >
+          <MaterialCommunityIcons
+            name="logout"
+            size={iconSizes.sm}
+            color={colors.danger}
+          />
 
-            {insight && <InsightCard insight={insight} />}
+          <Text style={styles.logoutButtonText}>
+            Sair
+          </Text>
+        </Pressable>
+      </View>
 
-            <QuickActions />
+      {loading ? (
+        <LoadingState message="Carregando informações..." />
+      ) : (
+        <>
+          <BalanceCard summary={summary} />
 
-            <LatestTransactions
-              transactions={latestTransactions}
-              onDelete={handleDeleteTransaction}
-              onEdit={handleEditTransaction}
-            />
-          </>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+          {insight ? (
+            <InsightCard insight={insight} />
+          ) : null}
+
+          <QuickActions />
+
+          <LatestTransactions
+            transactions={latestTransactions}
+            onDelete={handleDeleteTransaction}
+            onEdit={handleEditTransaction}
+          />
+        </>
+      )}
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#020617",
-  },
-
   content: {
-    padding: 20,
-    paddingBottom: 40,
-    gap: 20,
+    flexGrow: 1,
+    gap: spacing.lg,
   },
 
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: spacing.md,
+  },
+
+  headerText: {
+    flex: 1,
   },
 
   welcomeText: {
-    color: "#94a3b8",
-    fontSize: 14,
+    color: colors.textSecondary,
+    fontSize: typography.caption,
   },
 
   title: {
-    color: "#f8fafc",
+    color: colors.text,
     fontSize: 24,
     fontWeight: "900",
-    marginTop: 2,
+    marginTop: spacing.xs,
   },
 
   logoutButton: {
-    backgroundColor: "#1e293b",
+    minHeight: 44,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.xs,
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: "#334155",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
 
   logoutButtonText: {
-    color: "#f8fafc",
-    fontSize: 14,
+    color: colors.text,
+    fontSize: typography.caption,
     fontWeight: "800",
   },
 
-  loadingContainer: {
-    minHeight: 300,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 12,
-  },
-
-  loadingText: {
-    color: "#94a3b8",
-    fontSize: 14,
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 });
