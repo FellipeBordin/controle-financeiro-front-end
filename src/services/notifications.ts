@@ -1,11 +1,7 @@
 import { Platform } from "react-native";
-import Constants from "expo-constants";
-
-const isWeb = Platform.OS === "web";
-const isExpoGo = Constants.executionEnvironment === "storeClient";
 
 async function getNotifications() {
-  if (isWeb || isExpoGo) {
+  if (Platform.OS === "web") {
     return null;
   }
 
@@ -63,10 +59,10 @@ export async function scheduleDailyExpenseReminder() {
       sound: true,
     },
     trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
       channelId: "default",
       hour: 20,
       minute: 0,
-      repeats: true,
     },
   });
 }
@@ -85,17 +81,19 @@ export async function scheduleMonthReviewReminder() {
       sound: true,
     },
     trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.MONTHLY,
       channelId: "default",
       day: 28,
       hour: 19,
       minute: 0,
-      repeats: true,
     },
   });
 }
 
 export async function enableFinancialNotifications() {
-  if (isWeb || isExpoGo) {
+  const Notifications = await getNotifications();
+
+  if (!Notifications) {
     return false;
   }
 
