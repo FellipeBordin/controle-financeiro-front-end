@@ -13,8 +13,6 @@ export function TransactionCategorySelector({
 }: TransactionCategorySelectorProps) {
   return (
     <View>
-      <Text style={styles.label}>Categoria</Text>
-
       <View style={styles.container}>
         {categories.map((category) => {
           const isActive = value === category;

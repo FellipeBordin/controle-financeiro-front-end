@@ -67,10 +67,7 @@ export function TransactionForm({
     <View style={styles.form}>
       {useTypeSelector ? (
         <FormField label="Tipo" required>
-          <TransactionTypeSelector
-            value={type}
-            onChange={onChangeType}
-          />
+          <TransactionTypeSelector value={type} onChange={onChangeType} />
         </FormField>
       ) : (
         <FormField label="Tipo" required>
@@ -114,16 +111,9 @@ export function TransactionForm({
         </FormField>
       )}
 
-      <FormField
-        label="Título"
-        required
-        error={errors.title}
-      >
+      <FormField label="Título" required error={errors.title}>
         <TextInput
-          style={[
-            styles.input,
-            errors.title && styles.inputError,
-          ]}
+          style={[styles.input, errors.title && styles.inputError]}
           placeholder="Ex.: Salário, mercado, combustível"
           placeholderTextColor={colors.textSecondary}
           value={title}
@@ -133,16 +123,9 @@ export function TransactionForm({
         />
       </FormField>
 
-      <FormField
-        label="Valor"
-        required
-        error={errors.amount}
-      >
+      <FormField label="Valor" required error={errors.amount}>
         <TextInput
-          style={[
-            styles.input,
-            errors.amount && styles.inputError,
-          ]}
+          style={[styles.input, errors.amount && styles.inputError]}
           placeholder="R$ 0,00"
           placeholderTextColor={colors.textSecondary}
           value={amount}
@@ -153,11 +136,7 @@ export function TransactionForm({
       </FormField>
 
       {useCategorySelector ? (
-        <FormField
-          label="Categoria"
-          required
-          error={errors.category}
-        >
+        <FormField label="Categoria" required error={errors.category}>
           <TransactionCategorySelector
             categories={categories}
             value={category}
@@ -165,16 +144,9 @@ export function TransactionForm({
           />
         </FormField>
       ) : (
-        <FormField
-          label="Categoria"
-          required
-          error={errors.category}
-        >
+        <FormField label="Categoria" required error={errors.category}>
           <TextInput
-            style={[
-              styles.input,
-              errors.category && styles.inputError,
-            ]}
+            style={[styles.input, errors.category && styles.inputError]}
             placeholder="Ex.: Alimentação, moradia, salário"
             placeholderTextColor={colors.textSecondary}
             value={category}
@@ -186,10 +158,7 @@ export function TransactionForm({
       )}
 
       {showNotes && onChangeNotes ? (
-        <FormField
-          label="Observação"
-          helperText="Campo opcional"
-        >
+        <FormField label="Observação" helperText="Campo opcional">
           <TextInput
             style={[styles.input, styles.textArea]}
             placeholder="Digite uma observação"
@@ -216,14 +185,10 @@ export function TransactionForm({
           <View style={styles.loadingContent}>
             <ActivityIndicator color={colors.text} />
 
-            <Text style={styles.saveButtonText}>
-              {loadingLabel}
-            </Text>
+            <Text style={styles.saveButtonText}>{loadingLabel}</Text>
           </View>
         ) : (
-          <Text style={styles.saveButtonText}>
-            {submitLabel}
-          </Text>
+          <Text style={styles.saveButtonText}>{submitLabel}</Text>
         )}
       </Pressable>
 
@@ -236,9 +201,7 @@ export function TransactionForm({
         disabled={loading}
         onPress={onCancel}
       >
-        <Text style={styles.cancelButtonText}>
-          Cancelar
-        </Text>
+        <Text style={styles.cancelButtonText}>Cancelar</Text>
       </Pressable>
     </View>
   );

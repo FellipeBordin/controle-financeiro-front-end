@@ -4,48 +4,49 @@
     "slug": "finan-control",
     "version": "1.0.0",
     "orientation": "portrait",
-
-    "icon": "./assets/images/icon.png",
-
+    "icon": "./assets/icon.png",
     "scheme": "financontrol",
     "userInterfaceStyle": "automatic",
-
     "ios": {
       "supportsTablet": true
     },
-
     "android": {
+      "icon": "./assets/icon.png",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#020617"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.fellipedev.financontrol"
     },
-
     "web": {
       "output": "static"
     },
-
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/splash-icon.png",
           "imageWidth": 300,
           "resizeMode": "contain",
           "backgroundColor": "#020617",
           "dark": {
-            "image": "./assets/images/splash-icon.png",
+            "image": "./assets/splash-icon.png",
             "backgroundColor": "#020617"
           }
         }
       ]
     ],
-
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "dbc2e8a7-a9cb-45b4-8931-416baee7bae0"
+      }
     }
   }
 }
