@@ -29,8 +29,7 @@ O FinanControl permite registrar receitas e despesas, acompanhar o saldo, criar 
 <p align="center">
   <strong>Planejamento mensal</strong>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <strong>Alertas automáticos</strong>
-</p>
+  </p>
 
 ---
 
